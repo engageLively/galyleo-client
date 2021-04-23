@@ -29,7 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from ipykernel.comm import Comm
-from galyleo.dashboard_table import GalyleoTable
+from galyleo.galyleo_table import GalyleoTable
 
 '''
 The Dashboard Client.  This is the client which sends the tables to the dashboard
@@ -49,4 +49,6 @@ class GalyleoClient:
     # Very simple. Convert the table to a dictionary and send it to the dashboard
     # and wrap it in a payload to send to the dashboard
     table_record = galyleo_table.as_dictionary()
+    if (dashboard_name):
+      table_record["dashboard"] = dashboard_name
     self._comm_.send(table_record)
