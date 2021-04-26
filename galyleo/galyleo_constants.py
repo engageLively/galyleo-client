@@ -39,12 +39,14 @@ GALYLEO_DATE = 'date'
 GALYLEO_DATETIME = 'datetime'
 GALYLEO_TIME_OF_DAY = 'timeofday'
 
-# Types for a chart/dashboard table schema
+""" Types for a chart/dashboard table schema"""
 GALYLEO_SCHEMA_TYPES = ['string', 'number', 'boolean', 'date', 'datetime','timeofday']
 
-# Data related.
-MAX_DATA_SIZE = 1*2**20 # 1MB
-MAX_CHART_DATA_POINTS = 1000000  # 1 million data points per chart at most.
+""" Maximum size of a table being sent to the dashoard """
+MAX_DATA_SIZE = 1*2**24 # 16MB
+
+"""Maximum number of rows in a table"""
+MAX_TABLE_ROWS = 1000000  # 1 million rows per table  at most.
 
 # Other constants
 MILLISECONDS_PER_SECOND = 1000

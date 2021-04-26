@@ -30,24 +30,38 @@
 
 from ipykernel.comm import Comm
 from galyleo.galyleo_table import GalyleoTable
+from galyleo.galyleo_exceptions import DataSizeExceeded
+from galyleo.galyleo_constants import MAX_DATA_SIZE, MAX_TABLE_ROWS
 
-'''
-The Dashboard Client.  This is the client which sends the tables to the dashboard
-and handles requests coming from the dashboard for tables.
-'''
+
 
 class GalyleoClient:
+  """
+  The Dashboard Client.  This is the client which sends the tables to the dashboard
+  and handles requests coming from the dashboard for tables.
+  """
   def __init__(self):
     self._comm_ = Comm(target_name='galyleo_data', data={'foo': 1})
 
-#
-# The routine to send a GalyleoTable to the dashboard, optionally specifying a specific 
-# dashboard to send the data to.  If None is specified, 
-# 
 
   def send_data_to_dashboard(self, galyleo_table, dashboard_name:str = None)->None:
+    """ 
+    The routine to send a GalyleoTable to the dashboard, optionally specifying a specific 
+    dashboard to send the data to.  If None is specified, sends to all the dashboards.
+    The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form)
+    > galyleo_constants.MAX_DATA_SIZE.  If either of these conditions apply, a DataSizeExceeded exception is 
+    thrown.
+    parameters:
+      galyleo_table: the table to send to the dashboard
+      dashboard_name: name of the dashboard to send it to (if None, sent to all)
+    """
     # Very simple. Convert the table to a dictionary and send it to the dashboard
     # and wrap it in a payload to send to the dashboard
+    if (len(table.rows) > MAX_TABLE_ROWS):
+      raise DataSizeExceeded(f"{len(table.rows)} rows is greater than the maximum permitted, {MAX_TABLE_ROWS}")
+    string_form = table.to_json()
+    if (len(string_form) > MAX_DATA_SIZE):
+      raise DataSizeExceeded(f"{len(string_form)} bytes is greater than the maximum permitted, {MAX_DATA_SIZE}")
     table_record = galyleo_table.as_dictionary()
     if (dashboard_name):
       table_record["dashboard"] = dashboard_name
