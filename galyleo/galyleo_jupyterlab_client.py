@@ -57,9 +57,9 @@ class GalyleoClient:
     """
     # Very simple. Convert the table to a dictionary and send it to the dashboard
     # and wrap it in a payload to send to the dashboard
-    if (len(table.rows) > MAX_TABLE_ROWS):
+    if (len(galyleo_table.data) > MAX_TABLE_ROWS):
       raise DataSizeExceeded(f"{len(table.rows)} rows is greater than the maximum permitted, {MAX_TABLE_ROWS}")
-    string_form = table.to_json()
+    string_form = galyleo_table.to_json()
     if (len(string_form) > MAX_DATA_SIZE):
       raise DataSizeExceeded(f"{len(string_form)} bytes is greater than the maximum permitted, {MAX_DATA_SIZE}")
     table_record = galyleo_table.as_dictionary()
