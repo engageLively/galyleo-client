@@ -28,7 +28,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Constants that are used throughout the module."""
+"""
+Constants that are used throughout the module.  These include:
+   1. Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE,
+      GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
+   2. GALYLEO_TYPES: The types in a list
+   3. MAXIMUM_DATA_SIZE: Maximum size, in bytes, of a GalyleoTable
+   4. MAX_TABLE_ROWS: Maximum number of rows in a GalyleoTable
+"""
 
 LIBRARY_VERSION = "2021.x.y"
 
@@ -39,11 +46,11 @@ GALYLEO_DATE = 'date'
 GALYLEO_DATETIME = 'datetime'
 GALYLEO_TIME_OF_DAY = 'timeofday'
 
-""" Types for a chart/dashboard table schema"""
+""" Types for a chart/dashboard table schema """
 GALYLEO_SCHEMA_TYPES = ['string', 'number', 'boolean', 'date', 'datetime','timeofday']
 
-""" Maximum size of a table being sent to the dashoard """
-MAX_DATA_SIZE = 1*2**24 # 16MB
+""" Maximum size of a table being sent to the dashoard.  Exceeding this will throw a DataSizeExceeded exception """
+MAX_DATA_SIZE = 1*2**24  
 
 """Maximum number of rows in a table"""
 MAX_TABLE_ROWS = 1000000  # 1 million rows per table  at most.

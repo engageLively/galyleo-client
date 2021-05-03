@@ -27,7 +27,7 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-name = "galyleo"
+
 """
 The Python client for Galyleo Tables and JupyterLab.  This client is used to form Galyleo Tables, the basis of charting and dashboards with the Galyleo environment, and send them through the Jupyter communications channel to the browser to be plotted.  The library consists of several modules:
 1. galyleo_table.  Defines a Galyleo Dashboard Table and associated export and import routines.  Used to create a Galyleo Dashboard Table from any of a number of sources, and then generate an object that is suitable
@@ -38,3 +38,4 @@ Convenience routines provided here to import data from pandas, and json format.
 3. galyleo_exceptions: Exceptions raised by the module.  These notably include exceptions raised by galyleo_jupyter_client when a table is too large to be sent, and by galyleo_table when a table's schema and data don't match
 4. galyleo_jupyter_client: A clien that actually sends data to JupyterLab
 """
+name = "galyleo"

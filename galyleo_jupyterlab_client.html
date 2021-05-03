@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module galyleo_jupyterlab_client</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>galyleo_jupyterlab_client</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/rick/Projects/engageLively/el-galyleo-client/galyleo/galyleo_jupyterlab_client.py">/Users/rick/Projects/engageLively/el-galyleo-client/galyleo/galyleo_jupyterlab_client.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;BSD&nbsp;3-Clause&nbsp;License</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="galyleo_jupyterlab_client.html#GalyleoClient">GalyleoClient</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="GalyleoClient">class <strong>GalyleoClient</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;Dashboard&nbsp;Client.&nbsp;&nbsp;This&nbsp;is&nbsp;the&nbsp;client&nbsp;which&nbsp;sends&nbsp;the&nbsp;tables&nbsp;to&nbsp;the&nbsp;dashboard<br>
+and&nbsp;handles&nbsp;requests&nbsp;coming&nbsp;from&nbsp;the&nbsp;dashboard&nbsp;for&nbsp;tables.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="GalyleoClient-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Initialize&nbsp;the&nbsp;client.&nbsp;&nbsp;No&nbsp;parameters.&nbsp;&nbsp;This&nbsp;initializes&nbsp;communications&nbsp;with&nbsp;the&nbsp;JupyterLab&nbsp;Galyleo&nbsp;Communications&nbsp;Manager</tt></dd></dl>
+
+<dl><dt><a name="GalyleoClient-send_data_to_dashboard"><strong>send_data_to_dashboard</strong></a>(self, galyleo_table, dashboard_name: str = None) -&gt; None</dt><dd><tt>The&nbsp;routine&nbsp;to&nbsp;send&nbsp;a&nbsp;GalyleoTable&nbsp;to&nbsp;the&nbsp;dashboard,&nbsp;optionally&nbsp;specifying&nbsp;a&nbsp;specific&nbsp;<br>
+dashboard&nbsp;to&nbsp;send&nbsp;the&nbsp;data&nbsp;to.&nbsp;&nbsp;If&nbsp;None&nbsp;is&nbsp;specified,&nbsp;sends&nbsp;to&nbsp;all&nbsp;the&nbsp;dashboards.<br>
+The&nbsp;table&nbsp;must&nbsp;not&nbsp;have&nbsp;more&nbsp;than&nbsp;galyleo_constants.MAX_NUMBER_ROWS,&nbsp;nor&nbsp;be&nbsp;(in&nbsp;JSON&nbsp;form)&nbsp;&gt;&nbsp;galyleo_constants.MAX_DATA_SIZE.&nbsp;<br>
+If&nbsp;either&nbsp;of&nbsp;these&nbsp;conditions&nbsp;apply,&nbsp;a&nbsp;DataSizeExceeded&nbsp;exception&nbsp;is&nbsp;thrown.<br>
+NOTE:&nbsp;this&nbsp;secnds&nbsp;data&nbsp;to&nbsp;one&nbsp;or&nbsp;more&nbsp;open&nbsp;dashboard&nbsp;editors&nbsp;in&nbsp;JupyterLab.&nbsp;&nbsp;If&nbsp;there&nbsp;are&nbsp;no&nbsp;dashboard&nbsp;editors&nbsp;open,&nbsp;it&nbsp;will&nbsp;have&nbsp;no&nbsp;effect.<br>
+&nbsp;<br>
+parameters:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;galyleo_table:&nbsp;the&nbsp;table&nbsp;to&nbsp;send&nbsp;to&nbsp;the&nbsp;dashboard<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dashboard_name:&nbsp;name&nbsp;of&nbsp;the&nbsp;dashboard&nbsp;editor&nbsp;to&nbsp;send&nbsp;it&nbsp;to&nbsp;(if&nbsp;None,&nbsp;sent&nbsp;to&nbsp;all)</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>MAX_DATA_SIZE</strong> = 16777216<br>
+<strong>MAX_TABLE_ROWS</strong> = 1000000</td></tr></table>
+</body></html>

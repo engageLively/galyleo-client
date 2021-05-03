@@ -41,6 +41,7 @@ class GalyleoClient:
   and handles requests coming from the dashboard for tables.
   """
   def __init__(self):
+    """Initialize the client.  No parameters.  This initializes communications with the JupyterLab Galyleo Communications Manager """
     self._comm_ = Comm(target_name='galyleo_data', data={'foo': 1})
 
 
@@ -48,12 +49,14 @@ class GalyleoClient:
     """ 
     The routine to send a GalyleoTable to the dashboard, optionally specifying a specific 
     dashboard to send the data to.  If None is specified, sends to all the dashboards.
-    The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form)
-    > galyleo_constants.MAX_DATA_SIZE.  If either of these conditions apply, a DataSizeExceeded exception is 
-    thrown.
+    The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form) > galyleo_constants.MAX_DATA_SIZE. 
+    If either of these conditions apply, a DataSizeExceeded exception is thrown.
+    NOTE: this secnds data to one or more open dashboard editors in JupyterLab.  If there are no dashboard editors open, it will have no effect.
+
     parameters:
-      galyleo_table: the table to send to the dashboard
-      dashboard_name: name of the dashboard to send it to (if None, sent to all)
+        galyleo_table: the table to send to the dashboard
+        dashboard_name: name of the dashboard editor to send it to (if None, sent to all)
+
     """
     # Very simple. Convert the table to a dictionary and send it to the dashboard
     # and wrap it in a payload to send to the dashboard

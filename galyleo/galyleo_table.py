@@ -59,11 +59,21 @@ class GalyleoTable:
     and in the same order.  If names_must_match == True (default is False),
     then the names must also match
     parameters:
-    table: table to be checked for equality
-    names_must_match: (default False) if True, table names must also match
+        table: table to be checked for equality
+        names_must_match: (default False) if True, table names must also match
     """
 
     def equal(self, table, names_must_match = False):
+        """ 
+        Test to see if this table is equal to another table, passed as
+        an argument.  Two tables are equal if their schemas are the same
+        length and column names and types match, and if the data is the same,
+        and in the same order.  If names_must_match == True (default is False),
+        then the names must also match
+        parameters:
+        table: table to be checked for equality
+        names_must_match: (default False) if True, table names must also match
+        """
         if (len(self.schema) != len(table.schema)):
             return False
         if (len(self.data) != len(table.data)):
@@ -106,24 +116,23 @@ class GalyleoTable:
         except gviz_api.DataTableException as schema_error:
             raise InvalidDataException(schema_error)
 
-
-    """     
-    Load from a pair (schema, data).
-    Schema is a list of pairs [(<column_name>, <column_type>)]
-    where column_type is one of GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
-    GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY.  All of these are defined
-    in livelyconst.  data is a list of lists, where each list is a row of 
-    the table.  Two conditions:
-    (1) Each type must be one of types listed above
-    (2) Each list in data must have the same length as the schema, and the type of each
-        element must match the corresponding schema type
-    throws an InvalidDataException if either of these are violeated
-    parameters:
-        schema: the schema as a list of pairs
-        data: the data as a list of lists
-    """
     
     def load_from_schema_and_data(self, schema:list, data:list):
+        """     
+        Load from a pair (schema, data).
+        Schema is a list of pairs [(<column_name>, <column_type>)]
+        where column_type is one of the Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
+        in galyleo_constants.  data is a list of lists, where each list is a row of 
+        the table.  Two conditions:
+        (1) Each type must be one of types listed above
+        (2) Each list in data must have the same length as the schema, and the type of each
+            element must match the corresponding schema type
+        throws an InvalidDataException if either of these are violeated
+        parameters:
+            schema: the schema as a list of pairs
+            data: the data as a list of lists
+        """
         self._check_schema_match(schema, data)
         self.schema = [{"name": record[0], "type": record[1]} for record in schema]
         self.data = data # should I clone?
@@ -151,7 +160,8 @@ class GalyleoTable:
     def load_from_dataframe(self, dataframe, schema = None):
         """    
         Load from a Pandas Dataframe.  The schema is given in the optional second parameter,
-        as a list of records {"name": <name>, "type": <type>}, where type is a Galyleo type. 
+        as a list of records {"name": <name>, "type": <type>}, where type is a Galyleo type. (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY). 
         If the second parameter is not present, the schema is derived from the name and
         column types of the dataframe, and each row of the dataframe becomes a row
         of the table.  
@@ -169,38 +179,41 @@ class GalyleoTable:
         rows = [r for r in dataframe.iterrows()]
         self.data = [r[1].tolist() for r in rows]
     
-    """     
-    Return the form of the table as a dictionary.  This is a dictionary
-    of the form:
-    {"name": <table_name>,
-    "table": {
-        "columns": [<list of schema records],
-        "rows": [<list of rows of the table>]
-      }
-    }
-    A schema record is a record of the form:
-    {"name": < column_name>, "type": <column_type}, where type is one of the 
-    Galyleo types
-    """
+   
     def as_dictionary(self):
+        """     
+        Return the form of the table as a dictionary.  This is a dictionary
+        of the form:
+        {"name": <table_name>,
+        "table": {
+            "columns": [<list of schema records],
+            "rows": [<list of rows of the table>]
+        }
+        A schema record is a record of the form:
+        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
+        in galyleo_constants.
+        """
         return {"name": self.name, "table": {"columns": self.schema, "rows": self.data}}
 
-    """     
-    load data from a dictionary of the form 
-        "columns": [<list of schema records],
-        "rows": [<list of rows of the table>]
-      }
-    }
-    A schema record is a record of the form:
-    {"name": < column_name>, "type": <column_type}, where type is one of the 
-    Galyleo types
     
-    Throws InvalidDataException if the dictionary is of the wrong format
-    or the rows don't match the columns
-    parameters
-      dict: the table as a dictionary
-    """
     def load_from_dictionary(self, dict):
+        """     
+        load data from a dictionary of the form 
+            "columns": [<list of schema records],
+            "rows": [<list of rows of the table>]
+        }
+        A schema record is a record of the form:
+        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  
+        
+        Throws InvalidDataException if the dictionary is of the wrong format
+        or the rows don't match the columns.
+        parameters
+            dict: the table as a dictionary
+        """
         self._check_fields(dict, {"columns", "rows"}, 'JSON  table descriptor')
         columns = dict["columns"]
         for column in columns:
@@ -210,12 +223,13 @@ class GalyleoTable:
         self.schema = columns
         self.data = dict["rows"]
 
-    """     
-    Return the table as a JSON string, suitable for transmitting as a message
-    or saving to a file.  This is just a JSON form of the dictionary form of
-    the string
-    """
+    
     def to_json(self):
+        """     
+        Return the table as a JSON string, suitable for transmitting as a message
+        or saving to a file.  This is just a JSON form of the dictionary form of
+        the string.  (See as_dictionary)
+        """
         return dumps(self.as_dictionary())
 
     #
@@ -232,16 +246,17 @@ class GalyleoTable:
         if (not fields.issuperset(required_fields)):
             raise InvalidDataException(f'{message_header} is missing fields {required_fields - fields}')
 
-    """     
-    Load the table from a JSON string, of the form produced by toJSON().  Note
-    that if the overwrite_name parameter = True (the default), this will also
-    overwrite the table name.
-    Throws InvalidDataException id json_form is malformed
-    parameters:
-      json_form: the JSON string to turn into a Table
-    """
+    
     
     def from_json(self, json_form, overwrite_name = True):
+        """     
+        Load the table from a JSON string, of the form produced by toJSON().  Note
+        that if the overwrite_name parameter = True (the default), this will also
+        overwrite the table name.
+        Throws InvalidDataException id json_form is malformed
+        parameters:
+            json_form: the JSON string to turn into a Table
+        """
         try:
             record = loads(json_form)
         except JSONDecodeError(msg):

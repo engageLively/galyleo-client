@@ -37,18 +37,11 @@ class Error(Exception):
 
 class DataSizeExceeded(Error):
   """Raised when the data volume is too large on a single request.
-
-  The exact limitations are specified in README.md
+     The exact limitations are specified in README.md and in galyleo_constants
 
   """
   def __str__(self):
     return "Data Size Exceeded"
-
-class NoRoomSpecified(Error):
-  """Raised when the API did not propagate a room to the sending function."""
-
-  def __str__(self):
-    return "No Room Specified"
 
 class DataSizeIsZero(Error):
   """Raised when the data set is empty."""
@@ -56,9 +49,11 @@ class DataSizeIsZero(Error):
   def __str__(self):
     return "Data Size Is Zero"
 
-'''
-An exception thrown when a data table (list of rows) doesn't match an accoompanying schema
-''' 
+
 
 class InvalidDataException(Exception):
+  '''
+  An exception thrown when a data table (list of rows) doesn't match an accoompanying schema,
+  or a bad schema is specified, or a table row is the wrong length, or..
+  ''' 
   pass
