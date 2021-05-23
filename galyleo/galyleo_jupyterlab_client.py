@@ -51,9 +51,9 @@ class GalyleoClient:
     dashboard to send the data to.  If None is specified, sends to all the dashboards.
     The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form) > galyleo_constants.MAX_DATA_SIZE. 
     If either of these conditions apply, a DataSizeExceeded exception is thrown.
-    NOTE: this secnds data to one or more open dashboard editors in JupyterLab.  If there are no dashboard editors open, it will have no effect.
+    NOTE: this sends data to one or more open dashboard editors in JupyterLab.  If there are no dashboard editors open, it will have no effect.
 
-    parameters:
+    Args:
         galyleo_table: the table to send to the dashboard
         dashboard_name: name of the dashboard editor to send it to (if None, sent to all)
 

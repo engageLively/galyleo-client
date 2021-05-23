@@ -36,6 +36,7 @@ from galyleo.galyleo_exceptions import InvalidDataException
 import pandas as pd
 import numpy
 from json import dumps
+import csv
 
 #
 # Test creation of a table, simple empty initialization
@@ -208,3 +209,144 @@ def test_to_json():
     as_json = dumps(test_dict)
     reference_json = reference_table.to_json()
     assert(as_json == reference_json)
+
+#
+# A utility that tests if two lists of lists are equal.   Only works
+# if the entries in each row of both lists are hashable (strings, ints, tuples)
+#
+def lists_equal(list1, list2):
+    tuples1 = [tuple(row) for row in list1]
+    tuples2 = [tuple(row) for row in list2]
+    set1 = set(tuples1)
+    set2 = set(tuples2)
+    return set1 == set2
+
+
+#
+# test aggregate_columns
+#
+
+def test_aggregate_by():
+    schema = [{"name": "country", "type": GALYLEO_STRING}, {"name": "rating", "type": GALYLEO_NUMBER}]
+    countries = ['USA', 'Canada', 'Australia']
+    ratings = range(1, 4)
+    data = [[country, rating] for country in countries for rating in ratings]
+    data = data + [['USA', rating] for rating in ratings]
+    test_table = GalyleoTable('test')
+    test_table.load_from_dictionary({"columns": schema, "rows": data})
+    with pytest.raises(InvalidDataException, match='No columns specified for aggregation'):
+        test_table.aggregate_by(None, "count")
+    with pytest.raises(InvalidDataException, match='No columns specified for aggregation'):
+        test_table.aggregate_by([], "count")    
+    with pytest.raises(InvalidDataException, match="Columns {'state'} are not present in the schema"):
+        test_table.aggregate_by(['country', 'state'], "count")
+    table2 = test_table.aggregate_by(["country"])
+    expected_result = [['USA', 6], ['Canada', 3], ['Australia', 3]]
+    assert(lists_equal(expected_result, table2.data))
+    names = [entry["name"] for entry in table2.schema]
+    assert(names == ["country", "count"])
+    types = [entry["type"] for entry in table2.schema]
+    assert(types == [GALYLEO_STRING, GALYLEO_NUMBER])
+    assert(table2.name == "aggregate_c")
+    table3 = test_table.aggregate_by(["country"], "mentions", "table_name")
+    assert(table3.name == "table_name")
+    names = [entry["name"] for entry in table3.schema]
+    assert(names == ["country", "mentions"])
+    table4 = test_table.aggregate_by(["country", "rating"])
+    expected_result = [[country, i, 2 if country == "USA" else 1] for i in ratings for country in countries]
+    assert(lists_equal(expected_result, table4.data))
+    names = [entry["name"] for entry in table4.schema]
+    assert(names == ["country", "rating", "count"])
+    types = [entry["type"] for entry in table4.schema]
+    assert(types == [GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER])
+    assert(table4.name == "aggregate_cr")
+
+#
+# A table to be used in testing filtering
+#
+
+def filter_test_table():
+    table = GalyleoTable('filter_test')
+    schema = [{"name": "country", "type": GALYLEO_STRING}, {"name": "rating", "type": GALYLEO_NUMBER}, {"name": "population", "type": GALYLEO_NUMBER}]
+    data =[ ['USA', 3, 340000], ['Canada', 5, 39000], ['Australia', 4, 24000], ['France', 3, 66000]]
+    table.load_from_dictionary({"columns": schema, "rows": data})
+    return table
+
+#
+# test filter_by_function
+#
+def test_filter_by_function():
+    table = filter_test_table()
+    with pytest.raises(InvalidDataException, match='new_table_name cannot be empty'):
+        table.filter_by_function('foo', lambda x: x > 3, '')
+    with pytest.raises(InvalidDataException, match='column_name cannot be empty'):
+        table.filter_by_function('', lambda x: x > 3, 'foo')
+    with pytest.raises(InvalidDataException, match='Column foo not found'):
+        table.filter_by_function('foo', lambda x: x > 3, 'foo')
+    with pytest.raises(InvalidDataException, match=f'Type {GALYLEO_STRING} not found in *'):
+        table.filter_by_function('country', lambda x: x > 3, 'foo', {GALYLEO_NUMBER})
+    table2 = table.filter_by_function('country', lambda x: x == 'USA', 'foo')
+    assert(table2.schema == table.schema[1:])
+    assert(table2.data == [[3, 340000]])
+    assert(table2.name == 'foo')
+    table3 = table.filter_by_function('rating', lambda x: x > 3, 'bar', {GALYLEO_NUMBER})
+    assert(table3.schema == [table.schema[0], table.schema[2]])
+    assert(table3.data == [['Canada', 39000], ['Australia', 24000]])
+    assert(table3.name == 'bar')
+    table4 = table.filter_equal('rating', 3, 'bar', {GALYLEO_NUMBER})
+    assert(table4.schema == [table.schema[0], table.schema[2]])
+    assert(table4.data == [['USA', 340000], ['France', 66000]])
+    assert(table4.name == 'bar')
+    with pytest.raises(InvalidDataException, match=' should be a tuple of length 2'):
+        table.filter_range('rating', None, 'foo', {GALYLEO_NUMBER})
+    with pytest.raises(InvalidDataException, match='3 should be a tuple of length 2'):
+        table.filter_range('rating', 3, 'foo', {GALYLEO_NUMBER})
+    with pytest.raises(InvalidDataException):
+        table.filter_range('rating', (1, 2, 3), 'foo', {GALYLEO_NUMBER})
+    table5 = table.filter_range('population', (39000, 70000), 'bar', {GALYLEO_NUMBER})
+    assert(table5.schema == table.schema[:2])
+    assert(table5.data == [['Canada', 5], ['France', 3]])
+    assert(table5.name == 'bar')
+
+def test_pivot_on_column():
+
+    def make_data_row(row):
+        cleaned = [entry.strip() for entry in row]
+        return [int(entry) for entry in cleaned[0:3]] + cleaned[3:7] + [float(cleaned[7])]
+    with open('tests/pivot_test_file.csv', 'r') as ufo_file:
+        ufo_reader = csv.reader(ufo_file)
+        header = next(ufo_reader)
+        data = [make_data_row(row) for row in ufo_reader]
+    names = [entry.strip() for entry in header]
+    types = [GALYLEO_NUMBER for i in range(3)] + [GALYLEO_STRING for i in range(4)] + [GALYLEO_NUMBER]
+    schema = [{"name": names[i], "type": types[i]} for i in range(len(types))]
+    t1 = GalyleoTable("t1")
+    t1.load_from_dictionary({"columns": schema, "rows": data})
+    t2 = t1.aggregate_by(["country", "year", "month", "timeofday"])
+    with pytest.raises(InvalidDataException, match = 'new_table_name cannot be empty'):
+        t2.pivot_on_column("timeofday", "count", "")
+    with pytest.raises(InvalidDataException, match = 'pivot_column_name cannot be empty'):
+        t2.pivot_on_column("", "count", "tod_pivot")
+    with pytest.raises(InvalidDataException, match = 'value_column_name cannot be empty'):
+        t2.pivot_on_column("timeofday", "", "tod_pivot")
+    with pytest.raises(InvalidDataException, match = 'Pivot and value columns cannot be identical: both are count'):
+        t2.pivot_on_column("count", "count", "tod_pivot")
+    t3 = t2.pivot_on_column("timeofday", "count", "tod_pivot")
+    column_names = set([entry["name"] for entry in t3.schema])
+    assert(column_names == {"country", "year", "month", "morning", "afternoon",  "night"})
+    column_types = [entry["type"] for entry in t3.schema]
+    assert(column_types == [GALYLEO_NUMBER for i in range(2)] + [GALYLEO_STRING] + [GALYLEO_NUMBER for i in range(3)])
+    t5 = t1.aggregate_by(["country", "type"])
+    t6 = t5.pivot_on_column("type", "count", "type_pivot", {"disk", "triangle", "cylinder", "sphere"}, True)
+    column_names = set([entry["name"] for entry in t6.schema])
+    assert(column_names == {"country", "disk", "triangle", "cylinder", "sphere", "Other"})
+    column_types = [entry["type"] for entry in t6.schema]
+    assert(column_types == [GALYLEO_STRING] + [GALYLEO_NUMBER for i in range(5)])
+    t7 = t1.aggregate_by(["type"])
+    t8 = t7.pivot_on_column("type", "count", "pivot_with_other", {"disk"}, True)
+    t9 = t7.pivot_on_column("type", "count", "pivot_without_other", {"disk"}, False)
+    assert(len(t8.data) == 1 and len(t8.data[0]) == 2)
+    assert(len(t9.data) == 1 and len(t9.data[0]) == 1)
+    assert(t8.data[0][0] == t9.data[0][0])
+    assert(t8.data[0][0] + t8.data[0][1] == len(t1.data))
+    

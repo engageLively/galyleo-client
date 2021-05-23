@@ -36,8 +36,8 @@ class Error(Exception):
   pass
 
 class DataSizeExceeded(Error):
-  """Raised when the data volume is too large on a single request.
-     The exact limitations are specified in README.md and in galyleo_constants
+  """
+  Raised when the data volume is too large on a single request. The exact limitations are specified in README.md and in galyleo_constants
 
   """
   def __str__(self):

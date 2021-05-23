@@ -42,9 +42,9 @@ and&nbsp;handles&nbsp;requests&nbsp;coming&nbsp;from&nbsp;the&nbsp;dashboard&nbs
 dashboard&nbsp;to&nbsp;send&nbsp;the&nbsp;data&nbsp;to.&nbsp;&nbsp;If&nbsp;None&nbsp;is&nbsp;specified,&nbsp;sends&nbsp;to&nbsp;all&nbsp;the&nbsp;dashboards.<br>
 The&nbsp;table&nbsp;must&nbsp;not&nbsp;have&nbsp;more&nbsp;than&nbsp;galyleo_constants.MAX_NUMBER_ROWS,&nbsp;nor&nbsp;be&nbsp;(in&nbsp;JSON&nbsp;form)&nbsp;&gt;&nbsp;galyleo_constants.MAX_DATA_SIZE.&nbsp;<br>
 If&nbsp;either&nbsp;of&nbsp;these&nbsp;conditions&nbsp;apply,&nbsp;a&nbsp;DataSizeExceeded&nbsp;exception&nbsp;is&nbsp;thrown.<br>
-NOTE:&nbsp;this&nbsp;secnds&nbsp;data&nbsp;to&nbsp;one&nbsp;or&nbsp;more&nbsp;open&nbsp;dashboard&nbsp;editors&nbsp;in&nbsp;JupyterLab.&nbsp;&nbsp;If&nbsp;there&nbsp;are&nbsp;no&nbsp;dashboard&nbsp;editors&nbsp;open,&nbsp;it&nbsp;will&nbsp;have&nbsp;no&nbsp;effect.<br>
+NOTE:&nbsp;this&nbsp;sends&nbsp;data&nbsp;to&nbsp;one&nbsp;or&nbsp;more&nbsp;open&nbsp;dashboard&nbsp;editors&nbsp;in&nbsp;JupyterLab.&nbsp;&nbsp;If&nbsp;there&nbsp;are&nbsp;no&nbsp;dashboard&nbsp;editors&nbsp;open,&nbsp;it&nbsp;will&nbsp;have&nbsp;no&nbsp;effect.<br>
 &nbsp;<br>
-parameters:<br>
+Args:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;galyleo_table:&nbsp;the&nbsp;table&nbsp;to&nbsp;send&nbsp;to&nbsp;the&nbsp;dashboard<br>
 &nbsp;&nbsp;&nbsp;&nbsp;dashboard_name:&nbsp;name&nbsp;of&nbsp;the&nbsp;dashboard&nbsp;editor&nbsp;to&nbsp;send&nbsp;it&nbsp;to&nbsp;(if&nbsp;None,&nbsp;sent&nbsp;to&nbsp;all)</tt></dd></dl>
 

@@ -30,8 +30,7 @@
 
 """
 Constants that are used throughout the module.  These include:
-   1. Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE,
-      GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
+   1. Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY)
    2. GALYLEO_TYPES: The types in a list
    3. MAXIMUM_DATA_SIZE: Maximum size, in bytes, of a GalyleoTable
    4. MAX_TABLE_ROWS: Maximum number of rows in a GalyleoTable
