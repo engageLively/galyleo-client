@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>The Galyleo Python Client &mdash; Galyleo 05-23-2021 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #f87c04" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Galyleo
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">The Galyleo Python Client</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#module-galyleo.galyleo_table">Galyleo Table</a></li>
+<li><a class="reference internal" href="#module-galyleo.galyleo_jupyterlab_client">JupyterLab Client</a></li>
+<li><a class="reference internal" href="#module-galyleo.galyleo_exceptions">Galyleo Exceptions</a></li>
+<li><a class="reference internal" href="#module-galyleo.galyleo_constants">Galyleo Constants</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Galyleo</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>The Galyleo Python Client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/galyleo-client.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <a class="reference internal image-reference" href="_images/galyleo-logo.png"><img alt="_images/galyleo-logo.png" src="_images/galyleo-logo.png" style="width: 100px;" /></a>
+<div class="section" id="the-galyleo-python-client">
+<h1>The Galyleo Python Client<a class="headerlink" href="#the-galyleo-python-client" title="Permalink to this headline">¶</a></h1>
+<p>The Galyleo Python client is a module designed to convert Python structures into Galyleo Tables, and send them to dashboards for use with the Galyleo editor.  It consists of four components:</p>
+<ul class="simple">
+<li><p>galyleo.galyleo_table: classes and methods to create GalyleoTables, convert Python data structures into them, and produce and read JSON versions of the tables.</p></li>
+<li><p>galyleo.galyleo_jupyterlab_client: classes and methods to send Galyleo Tables to Galyleo dashboards runniung under JupyterLab clients</p></li>
+<li><p>galyleo.galyleo_constants: Symbolic constants used by these packages and the code which uses them</p></li>
+<li><p>galyleo.galyleo_exceptions; Exceptions thrown by the package</p></li>
+</ul>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The galyleo module can be installed using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">pypi</span><span class="o">.</span><span class="n">engagelively</span><span class="o">.</span><span class="n">com</span> <span class="n">galyleo</span>
+</pre></div>
+</div>
+<p>When the module is more thoroughly tested, it will be put on the standard pypi servers.</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">galyleo</span></code> is released under a standard BSD 3-Clause licence by engageLively</p>
+</div>
+<div class="section" id="module-galyleo.galyleo_table">
+<span id="galyleo-table"></span><h2>Galyleo Table<a class="headerlink" href="#module-galyleo.galyleo_table" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="galyleo.galyleo_table.GalyleoTable">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table.</span></code><code class="sig-name descname"><span class="pre">GalyleoTable</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Galyleo Dashboard Table.  Used to create a Galyleo Dashboard Table from any of a number of sources, and then generate an object that is suitable
+for storage (as a JSON file).  A GalyleoTable is very similar to  a Google Visualization data table, and can be
+converted to a Google Visualization Data Table on either the Python or the JavaScript side.
+Convenience routines provided here to import data from pandas, and json format.</p>
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.aggregate_by">
+<code class="sig-name descname"><span class="pre">aggregate_by</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aggregate_column_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'count'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.aggregate_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new table by aggregating over multiple columns.  The resulting table
+contains the aggregate column names and the new column name, and for each
+unique combination of values among the aggregate column names, the count of rows in this
+table with that unique combination of values.
+The new table will have name new_table_name
+Throws an InvalidDataException if aggregate_column_names is not a subset of the names in self.schema</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>aggregate_column_names: names of the  columns to aggregate over
+new_column_name: name of the column for the aggregate count.  Defaults to count
+new_table_name: name of the new table.  If omitted, defaults to None, in which case a name will be generated</p>
+</dd>
+<dt>Returns:</dt><dd><p>A new table with name new_table_name, or a generated name if new_table_name == None</p>
+</dd>
+<dt>Throws:</dt><dd><p>InvalidDataException if one of the column names is missing</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.as_dictionary">
+<code class="sig-name descname"><span class="pre">as_dictionary</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.as_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the form of the table as a dictionary.  This is a dictionary
+of the form:
+{“name”: &lt;table_name&gt;,”table”: &lt;table_struct&gt;} 
+where table_struct is of the form:
+{“columns”: [&lt;list of schema records],”rows”: [&lt;list of rows of the table&gt;]}</p>
+<p>A schema record is a record of the form:
+{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the 
+Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
+in galyleo_constants.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>None</p>
+</dd>
+<dt>Returns:</dt><dd><p>{“name”: &lt;table_name&gt;, “table”: {“columns”: &lt;list of schema records], “rows”: [&lt;list of rows of the table&gt;]}}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.equal">
+<code class="sig-name descname"><span class="pre">equal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names_must_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test to see if this table is equal to another table, passed as
+an argument.  Two tables are equal if their schemas are the same
+length and column names and types match, and if the data is the same,
+and in the same order.  If names_must_match == True (default is False),
+then the names must also match</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>table (GalyleoTable): table to be checked for equality
+names_must_match (bool): (default False) if True, table names must also match</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if equal, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.filter_by_function">
+<code class="sig-name descname"><span class="pre">filter_by_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.filter_by_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new table, with name table_name, with rows such that 
+function(row[column_name]) == True.  The new table will have
+columns {self.columns} - {column_name}, same types, and same order
+Throws an InvalidDataException if:
+1. new_table_name is None or not a string
+2. column_name is not a name of an existing column
+3. if column_types is not empty, the type of the selected column doesn’t match one of the allowed types</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>column_name: the column to filter by
+function: a Boolean function with a single argument of the type of columns[column_name]
+new_table_name: name of the new table
+column_types: set of the allowed column types; if empty, any type is permitted</p>
+</dd>
+<dt>Returns:</dt><dd><p>A table with column[column_name] missing and filtered</p>
+</dd>
+<dt>Throws:</dt><dd><p>InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn’t in column_types (if column_types is non-empty)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.filter_equal">
+<code class="sig-name descname"><span class="pre">filter_equal</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.filter_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience method over filter_by_function.  This is identical to
+filter_by_function(column_name, lambda x: x == value, new_table_name, column_types)</p>
+<dl>
+<dt>Args:</dt><dd><p>column_name: the column to filter by
+value: the value to march for equality
+new_table_name: name of the new table
+column_types: set of the allowed column types; if empty, any type is permitted</p>
+</dd>
+<dt>Returns:</dt><dd><blockquote>
+<div><p>A table with column[column_name] missing and filtered</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Throws:</dt><dd><p>InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn’t in column_types (if column_types is non-empty)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.filter_range">
+<code class="sig-name descname"><span class="pre">filter_range</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_as_tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.filter_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience method over filter_by_function.  This is identical to
+filter_by_function(column_name, lambda x: x &gt;= range_as_tuple[0], x &lt;= range_as_tuple[1], new_table_name, column_types)</p>
+<dl>
+<dt>Args:</dt><dd><p>column_name: the column to filter by
+range_as_tupe: the tuple representing the range
+new_table_name: name of the new table
+column_types: set of the allowed column types; if empty, any type is permitted</p>
+</dd>
+<dt>Returns:</dt><dd><blockquote>
+<div><p>A table with column[column_name] missing and filtered</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Throws:</dt><dd><p>InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn’t in column_types (if column_types is non-empty), if len(range_as_tuple) != 2</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.from_json">
+<code class="sig-name descname"><span class="pre">from_json</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_form</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the table from a JSON string, of the form produced by toJSON().  Note
+that if the overwrite_name parameter = True (the default), this will also
+overwrite the table name.</p>
+<p>Throws InvalidDataException id json_form is malformed</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>json_form: A JSON form of the Dictionary</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+<dt>Throws:</dt><dd><p>InvalidDataException if json_form is malformed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.load_from_dataframe">
+<code class="sig-name descname"><span class="pre">load_from_dataframe</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load from a Pandas Dataframe.  The schema is given in the optional second parameter,
+as a list of records {“name”: &lt;name&gt;, “type”: &lt;type&gt;}, where type is a Galyleo type. (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY). 
+If the second parameter is not present, the schema is derived from the name and
+column types of the dataframe, and each row of the dataframe becomes a row
+of the table.</p>
+<p>Args:</p>
+<blockquote>
+<div><p>dataframe (pandas dataframe): the pandas dataframe to load from
+schema (list of dictionaries): if present, the schema in list of dictionary form; each dictionary is of the form {“name”: &lt;column name&gt;, “type”: &lt;column type&gt;}</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.load_from_dictionary">
+<code class="sig-name descname"><span class="pre">load_from_dictionary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>load data from a dictionary of the form: {“columns”: [&lt;list of schema records], “rows”: [&lt;list of rows of the table&gt;]}</p>
+<p>A schema record is a record of the form:
+{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the 
+Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).</p>
+<p>Throws InvalidDataException if the dictionary is of the wrong format
+or the rows don’t match the columns.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dict: the table as a dictionary (a value returned by as_dictionary)</p>
+</dd>
+<dt>Throws:</dt><dd><p>InvalidDataException if dict is malformed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.load_from_schema_and_data">
+<code class="sig-name descname"><span class="pre">load_from_schema_and_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_schema_and_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load from a pair (schema, data).
+Schema is a list of pairs [(&lt;column_name&gt;, &lt;column_type&gt;)]
+where column_type is one of the Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
+in galyleo_constants.  data is a list of lists, where each list is a row of 
+the table.  Two conditions:</p>
+<ol class="arabic simple">
+<li><p>Each type must be one of types listed above</p></li>
+<li><p>Each list in data must have the same length as the schema, and the type of each
+element must match the corresponding schema type</p></li>
+</ol>
+<p>throws an InvalidDataException if either of these are violated</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>schema (list of pairs, (name, type)): the schema as a list of pairs
+data (list of lists): the data as a list of lists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.pivot_on_column">
+<code class="sig-name descname"><span class="pre">pivot_on_column</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pivot_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pivot_column_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.pivot_on_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pivot_on_column method breaks out value_column into n separate columns, one for each
+member of pivot_column_values plus (if other_column = True), an “Other” column.  This is easiest to see with an example.  Consider a table with columns (Year, State, Party, Percentage).  pivot_on_column(‘Party’, {‘Republican’, ‘Democratic’}, ‘Percentage’, ‘pivot_table’, False) would create a new table with columns Year, State, Republican, Democratic, where the values in the Republican and Democratic columns are the  values in the Percentage column where the Party column value was Republican or Democratic, respectively.  If Other = True, an additional column, Other, is found where the value is (generally) the sum of values where Party not equal Republican or Democratic</p>
+<dl>
+<dt>Args:</dt><dd><p>pivot_column_name: the column holding the keys to pivot on
+value_column_name: the column holding the values to spread out over the pivots
+new_table_name: name of the new table
+pivot_column_values: the values to pivot on.  If empty, all values used
+other_column: if True, aggregate other values into a column</p>
+</dd>
+<dt>Returns:</dt><dd><blockquote>
+<div><p>A table as described in the comments above</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Throws:</dt><dd><p>InvalidDataException if new_table_name is empty, pivot_column_name is not a name of an existing column, or value_column_name is not the name of an existing column</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="galyleo.galyleo_table.GalyleoTable.to_json">
+<code class="sig-name descname"><span class="pre">to_json</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the table as a JSON string, suitable for transmitting as a message
+or saving to a file.  This is just a JSON form of the dictionary form of
+the string.  (See as_dictionary)</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>as_dictionary() as a JSON string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-galyleo.galyleo_jupyterlab_client">
+<span id="jupyterlab-client"></span><h2>JupyterLab Client<a class="headerlink" href="#module-galyleo.galyleo_jupyterlab_client" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="galyleo.galyleo_jupyterlab_client.GalyleoClient">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_jupyterlab_client.</span></code><code class="sig-name descname"><span class="pre">GalyleoClient</span></code><a class="headerlink" href="#galyleo.galyleo_jupyterlab_client.GalyleoClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Dashboard Client.  This is the client which sends the tables to the dashboard
+and handles requests coming from the dashboard for tables.</p>
+<dl class="py method">
+<dt id="galyleo.galyleo_jupyterlab_client.GalyleoClient.send_data_to_dashboard">
+<code class="sig-name descname"><span class="pre">send_data_to_dashboard</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">galyleo_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashboard_name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="headerlink" href="#galyleo.galyleo_jupyterlab_client.GalyleoClient.send_data_to_dashboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>The routine to send a GalyleoTable to the dashboard, optionally specifying a specific 
+dashboard to send the data to.  If None is specified, sends to all the dashboards.
+The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form) &gt; galyleo_constants.MAX_DATA_SIZE. 
+If either of these conditions apply, a DataSizeExceeded exception is thrown.
+NOTE: this sends data to one or more open dashboard editors in JupyterLab.  If there are no dashboard editors open, it will have no effect.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>galyleo_table: the table to send to the dashboard
+dashboard_name: name of the dashboard editor to send it to (if None, sent to all)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-galyleo.galyleo_exceptions">
+<span id="galyleo-exceptions"></span><h2>Galyleo Exceptions<a class="headerlink" href="#module-galyleo.galyleo_exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Galyleo specific exceptions</p>
+<dl class="py exception">
+<dt id="galyleo.galyleo_exceptions.DataSizeExceeded">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_exceptions.</span></code><code class="sig-name descname"><span class="pre">DataSizeExceeded</span></code><a class="headerlink" href="#galyleo.galyleo_exceptions.DataSizeExceeded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when the data volume is too large on a single request. The exact limitations are specified in README.md and in galyleo_constants</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="galyleo.galyleo_exceptions.DataSizeIsZero">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_exceptions.</span></code><code class="sig-name descname"><span class="pre">DataSizeIsZero</span></code><a class="headerlink" href="#galyleo.galyleo_exceptions.DataSizeIsZero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised when the data set is empty.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="galyleo.galyleo_exceptions.Error">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_exceptions.</span></code><code class="sig-name descname"><span class="pre">Error</span></code><a class="headerlink" href="#galyleo.galyleo_exceptions.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for other exceptions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt id="galyleo.galyleo_exceptions.InvalidDataException">
+<em class="property"><span class="pre">exception</span> </em><code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_exceptions.</span></code><code class="sig-name descname"><span class="pre">InvalidDataException</span></code><a class="headerlink" href="#galyleo.galyleo_exceptions.InvalidDataException" title="Permalink to this definition">¶</a></dt>
+<dd><p>An exception thrown when a data table (list of rows) doesn’t match an accoompanying schema,
+or a bad schema is specified, or a table row is the wrong length, or..</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-galyleo.galyleo_constants">
+<span id="galyleo-constants"></span><h2>Galyleo Constants<a class="headerlink" href="#module-galyleo.galyleo_constants" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>Constants that are used throughout the module.  These include:</dt><dd><ol class="arabic simple">
+<li><p>Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY)</p></li>
+<li><p>GALYLEO_TYPES: The types in a list</p></li>
+<li><p>MAXIMUM_DATA_SIZE: Maximum size, in bytes, of a GalyleoTable</p></li>
+<li><p>MAX_TABLE_ROWS: Maximum number of rows in a GalyleoTable</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="py data">
+<dt id="galyleo.galyleo_constants.GALYLEO_SCHEMA_TYPES">
+<code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_constants.</span></code><code class="sig-name descname"><span class="pre">GALYLEO_SCHEMA_TYPES</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['string',</span> <span class="pre">'number',</span> <span class="pre">'boolean',</span> <span class="pre">'date',</span> <span class="pre">'datetime',</span> <span class="pre">'timeofday']</span></em><a class="headerlink" href="#galyleo.galyleo_constants.GALYLEO_SCHEMA_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum size of a table being sent to the dashoard.  Exceeding this will throw a DataSizeExceeded exception</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="galyleo.galyleo_constants.GALYLEO_TIME_OF_DAY">
+<code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_constants.</span></code><code class="sig-name descname"><span class="pre">GALYLEO_TIME_OF_DAY</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'timeofday'</span></em><a class="headerlink" href="#galyleo.galyleo_constants.GALYLEO_TIME_OF_DAY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Types for a chart/dashboard table schema</p>
+</dd></dl>
+
+<dl class="py data">
+<dt id="galyleo.galyleo_constants.MAX_DATA_SIZE">
+<code class="sig-prename descclassname"><span class="pre">galyleo.galyleo_constants.</span></code><code class="sig-name descname"><span class="pre">MAX_DATA_SIZE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">16777216</span></em><a class="headerlink" href="#galyleo.galyleo_constants.MAX_DATA_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum number of rows in a table</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, engageLively.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
