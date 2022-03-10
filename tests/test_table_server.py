@@ -173,3 +173,45 @@ def test_filter_in_list():
     filter = Filter(filter_spec, columns)
     assert(len(filter._filter_index(rows)) == 0 )
     assert(filter.filter(rows) ==[] )
+
+def is_partition(aSet, subset1, subset2):
+    return (aSet == subset1 | subset2) and (len(subset1 & subset2) == 0)
+
+def test_filter_not():
+    inner_filter_spec = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
+    inner_filter = Filter(inner_filter_spec, columns)
+    filter_spec = {
+        "operator": "NOT",
+        "argument": inner_filter_spec
+    }
+    filter = Filter(filter_spec, columns)
+    universal = set(range(len(rows)))
+    assert(is_partition(universal, filter._filter_index(rows), inner_filter._filter_index(rows)))
+
+def test_filter_and():
+    filter_spec1 = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
+    filter_spec2 = {"operator": "IN_RANGE", 'column': 'b', 'min_val': 6, 'max_val': 7}
+    filter_spec = {
+        "operator": "AND",
+        "arguments": [filter_spec1, filter_spec2]
+    }
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 1})
+    filter.arguments = [filter.arguments[0]]
+    assert(filter._filter_index(rows) == {0, 1,  3})
+    filter.arguments = []
+    assert(filter._filter_index(rows) == {0, 1, 2, 3})
+
+def test_filter_or():
+    filter_spec1 = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
+    filter_spec2 = {"operator": "IN_RANGE", 'column': 'b', 'min_val': 6, 'max_val': 7}
+    filter_spec = {
+        "operator": "OR",
+        "arguments": [filter_spec1, filter_spec2]
+    }
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 1, 2, 3})
+    filter.arguments = [filter.arguments[0]]
+    assert(filter._filter_index(rows) == {0, 1,  3})
+    filter.arguments = []
+    assert(len(filter._filter_index(rows)) == 0)

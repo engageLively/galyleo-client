@@ -97,7 +97,7 @@ class Filter:
             return reduce(lambda x, y: x & y, argument_indices, set(all_indices))
         elif (self.operator == 'OR'):
             argument_indices = [argument._filter_index(rows) for argument in self.arguments]
-            return reduce(lambda x, y: x | y, argument_indices, {})
+            return reduce(lambda x, y: x | y, argument_indices, set())
         elif (self.operator == 'NOT'):
             return set(all_indices) - self.argument._filter_index(rows)
         elif (self.operator == 'IN_LIST'):
@@ -105,7 +105,6 @@ class Filter:
             return set([i for i in all_indices if values[i] in self.value_list])
         else:
             values = [row[self.column] for row in rows]
-            print(values)
             return set([i for i in all_indices if values[i] <= self.max_val and values[i] >= self.min_val])
 
 
