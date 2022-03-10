@@ -1,6 +1,6 @@
 # BSD 3-Clause License
 
-# Copyright (c) 2019-2021, engageLively
+# Copyright (c) 2019-2022, engageLively
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -426,7 +426,7 @@ class GalyleoTable:
 
         Args:
             column_name: the column to filter by
-            range_as_tupe: the tuple representing the range
+            range_as_tuple: the tuple representing the range
             new_table_name: name of the new table
             column_types: set of the allowed column types; if empty, any type is permitted
         
@@ -569,6 +569,70 @@ class GalyleoTable:
 
 
 
+class RemoteGalyleoTable:
+    '''
+    A Remote Galyleo Table: This is instantiated with an URL which tells the 
+    dashboard where to get the data.  Note that this is much simpler than an explicit
+    GalyleoTable, since the data manipulation is all done by the remote server.
+    '''
+    def __init__(self, name:str, schema, base_url:str, header_variables = []):
+        '''
+        Initialize with the name, the schema (same as for an explicit table, above),
+        the base_url, and the header_variables which are used for authemtication
+        Arguments:
+            name: string, name of the table
+            schema: list of the form {"name", "type"} for each column, same as in the parent
+            base_url: the base URL to fetch the data from, a string.  The dashboard will add arguments for the methods
+                      The server must implement the Galyleo Data Protocol
+            header_variables: a list of strings: header variables which are to be transmitted to the data server for authentication
+
+        '''
+        self.name = name
+        self.schema = schema
+        self.base_url = base_url
+        self.header_variables = header_variables if header_variables else []
+
+    def as_dictionary(self):
+        """     
+        Return the form of the table as a dictionary.  This is a dictionary
+        of the form:
+        {"name": <table_name>,"table": <table_struct>} 
+        where table_struct is of the form:
+        {"columns": [<list of schema records], "base_url": base_url, "header_variables": list of header variables}
+
+        A schema record is a record of the form:
+        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
+        in galyleo_constants.
+
+        Args:
+            None
+
+        Returns:
+            {"name": <table_name>, "table": {"columns": <list of schema records], "base_url": base_url, "header_variables": list of header variables}}
+
+        """
+        return {
+            "name": self.name,
+            "columns": self.schema,
+            "table": {
+                "base_url": self.base_url,
+                "header_variables": self.header_variables
+            }
+        }
+        
+    def to_json(self):
+        """     
+        Return the table as a JSON string, suitable for transmitting as a message
+        or saving to a file.  This is just a JSON form of the dictionary form of
+        the string.  (See as_dictionary)
+
+        Returns:
+           as_dictionary() as a JSON string
+        
+        """
+        return dumps(self.as_dictionary())
 
         
        

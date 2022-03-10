@@ -29,7 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from galyleo.galyleo_table import GalyleoTable
+from galyleo.galyleo_table import GalyleoTable, RemoteGalyleoTable
 from galyleo.galyleo_constants import GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
 import pytest
 from galyleo.galyleo_exceptions import InvalidDataException
@@ -349,4 +349,46 @@ def test_pivot_on_column():
     assert(len(t9.data) == 1 and len(t9.data[0]) == 1)
     assert(t8.data[0][0] == t9.data[0][0])
     assert(t8.data[0][0] + t8.data[0][1] == len(t1.data))
+
+# Test Remote GalyleoTable
+def test_create_remote():
+    schema = [{"name": "country", "type": GALYLEO_STRING}, {"name": "rating", "type": GALYLEO_NUMBER}, {"name": "population", "type": GALYLEO_NUMBER}]
+    base_url = 'https://www.yahoo.com/foo/index.html'
+    table = RemoteGalyleoTable('test1', schema, base_url)
+    assert(table.name == 'test1')
+    assert(table.schema == schema)
+    assert(table.base_url == base_url)
+    assert(table.header_variables == [])
+    table = RemoteGalyleoTable('test1', schema, base_url, None)
+    assert(table.name == 'test1')
+    assert(table.schema == schema)
+    assert(table.base_url == base_url)
+    assert(table.header_variables == [])
+    table = RemoteGalyleoTable('test1', schema, base_url, ['a', 'b'])
+    assert(table.name == 'test1')
+    assert(table.schema == schema)
+    assert(table.base_url == base_url)
+    assert(table.header_variables == ['a', 'b'])
+
+#
+# Test as_dictionary for remote tables
+#
+
+def test_as_dictionary_remote():
+    schema = [{"name": "country", "type": GALYLEO_STRING}, {"name": "rating", "type": GALYLEO_NUMBER}, {"name": "population", "type": GALYLEO_NUMBER}]
+    base_url = 'https://www.yahoo.com/foo/index.html'
+    table = RemoteGalyleoTable('test1', schema, base_url)
+    assert(table.as_dictionary() == {
+        "name": "test1", "columns": schema, "table": {"base_url": base_url, "header_variables": []}
+    })
+    table = RemoteGalyleoTable('test1', schema, base_url, None)
+    assert(table.as_dictionary() == {
+        "name": "test1", "columns": schema, "table": {"base_url": base_url, "header_variables": []}
+    })
+    table = RemoteGalyleoTable('test1', schema, base_url, ['a', 'b'])
+    assert(table.as_dictionary() == {
+        "name": "test1", "columns": schema, "table": {"base_url": base_url, "header_variables": ['a', 'b']}
+    })
+
+
     
