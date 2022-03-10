@@ -29,7 +29,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from functools import reduce
-
 from galyleo.galyleo_constants import GALYLEO_NUMBER
 from galyleo.galyleo_exceptions import InvalidDataException
 
@@ -102,9 +101,12 @@ class Filter:
         elif (self.operator == 'NOT'):
             return set(all_indices) - self.argument._filter_index(rows)
         elif (self.operator == 'IN_LIST'):
-            return set([i for i in all_indices if rows[i] in self.value_list])
+            values = [row[self.column] for row in rows]
+            return set([i for i in all_indices if values[i] in self.value_list])
         else:
-            return set([i for i in all_indices if rows[i] <= self.max_val and rows[i] >= self.min_val])
+            values = [row[self.column] for row in rows]
+            print(values)
+            return set([i for i in all_indices if values[i] <= self.max_val and values[i] >= self.min_val])
 
 
 class GalyleoDataServer:

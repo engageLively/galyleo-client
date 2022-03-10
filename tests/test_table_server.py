@@ -132,3 +132,44 @@ def test_not():
     except InvalidDataException:
         return
     assert False, "Invalid Data Exception for missing column not raised"
+
+# rows for the tests of filters
+rows = [
+    ['a', 6, -1], ['b', 7, 3], ['c', 7, 2], ['a', 3, -1]
+]
+
+columns = ['a', 'b', 'c']
+
+def test_filter_range():
+    filter_spec = {"operator": "IN_RANGE", 'column': 'b', 'max_val': 6, 'min_val': 3}
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 3} )
+    assert(filter.filter(rows) ==[['a', 6, -1],  ['a', 3, -1]] )
+    filter_spec["max_val"] = 1
+    filter_spec["min_val"] = 0
+    filter = Filter(filter_spec, columns)
+    assert(len(filter._filter_index(rows)) == 0 )
+    assert(filter.filter(rows) ==[] )
+    filter_spec["max_val"] = 7
+    filter_spec["min_val"] = 6
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 1, 2} )
+    assert(filter.filter(rows) ==[['a', 6, -1], ['b', 7, 3], ['c', 7, 2]] )
+
+def test_filter_in_list():
+    filter_spec = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 1, 3} )
+    assert(filter.filter(rows) ==[['a', 6, -1],  ['b', 7, 3], ['a', 3, -1]] )
+    filter_spec["values"] = ['d']
+    filter = Filter(filter_spec, columns)
+    assert(len(filter._filter_index(rows)) == 0 )
+    assert(filter.filter(rows) ==[] )
+    filter_spec["values"] = ['a']
+    filter = Filter(filter_spec, columns)
+    assert(filter._filter_index(rows) == {0, 3} )
+    assert(filter.filter(rows) ==[['a', 6, -1], ['a', 3, -1]] )
+    filter_spec["values"] = []
+    filter = Filter(filter_spec, columns)
+    assert(len(filter._filter_index(rows)) == 0 )
+    assert(filter.filter(rows) ==[] )
