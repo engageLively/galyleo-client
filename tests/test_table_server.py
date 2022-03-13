@@ -33,6 +33,7 @@ from galyleo.galyleo_table_server import Filter, GalyleoDataServer
 from galyleo.galyleo_constants import GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
 from galyleo.galyleo_exceptions import InvalidDataException
 import pytest
+import pandas as pd
 
 def test_in_list():
     filter_spec = {"operator": "IN_LIST", 'column': 'a', 'values': [1, 2, 3]}
@@ -215,3 +216,43 @@ def test_filter_or():
     assert(filter._filter_index(rows) == {0, 1,  3})
     filter.arguments = []
     assert(len(filter._filter_index(rows)) == 0)
+
+def presidential_vote_rows():
+    frame  = pd.read_csv('tests/presidential_vote.csv')
+    return frame.to_numpy().tolist()
+
+def presidential_vote_column_values(column_name):
+    frame  = pd.read_csv('tests/presidential_vote.csv')
+    result = list(set(frame[column_name].tolist()))
+    result.sort()
+    return result
+
+# test forming a Galyleo Data Server
+
+def test_galyleo_server():
+    presidential_names = ['Year', 'State', 'Name', 'Party', 'Votes', 'Percentage']
+    presidential_types = [GALYLEO_NUMBER, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER]
+    schema = [{"name": presidential_names[i], "type": presidential_types[i]} for i in range(len(presidential_names))]
+    server = GalyleoDataServer(schema, presidential_vote_rows)
+    assert(server._column_names() == presidential_names)
+    assert(server.get_rows() == presidential_vote_rows())
+    with pytest.raises(InvalidDataException, match='foo is not a column of this table'):
+        server.all_values('foo')
+    states = server.all_values('State')
+    states1 = presidential_vote_column_values('State')
+    assert(states == states1)
+    with pytest.raises(InvalidDataException, match='foo is not a column of this table'):
+        server.numeric_spec('foo')
+    with pytest.raises(InvalidDataException, match=f'The type of Party must be {GALYLEO_NUMBER}, not {GALYLEO_STRING}'):
+        server.numeric_spec('Party')
+    assert(server.numeric_spec('Year') == {"max_val": 2020, "min_val": 1828, "increment": 4})
+    # We've already tested Filter, so testing get_filtered_rows just makes sure that
+    # calling the filter explicitly on the rows does the same thing as calling it through
+    # GalyleoDataServer
+    rows = presidential_vote_rows()
+    filter_spec = {"operator": "IN_LIST", "column": 'State', "values": ["California", "Hawaii"]}
+    filter = Filter(filter_spec, presidential_names)
+    filtered_rows = filter.filter(rows)
+    server_rows = server.get_filtered_rows(filter_spec)
+    assert(filtered_rows == server_rows) 
+

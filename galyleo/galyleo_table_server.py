@@ -137,7 +137,9 @@ class GalyleoDataServer:
         except ValueError:
             raise InvalidDataException(f'{column_name} is not a column of this table')
         rows = self.get_rows()
-        return list(set([row[index] for row in rows]))
+        result =  list(set([row[index] for row in rows]))
+        result.sort()
+        return result
 
     def numeric_spec(self, column_name:str):
         '''
@@ -155,7 +157,6 @@ class GalyleoDataServer:
             raise InvalidDataException(f'The type of {column_name} must be {GALYLEO_NUMBER}, not {entry[0]["type"]}')
         try:
             values = self.all_values(column_name)
-            values.sort()
             shift = values[1:]
             difference = [shift[i] - values[i] for i in range(len(shift))]
             increments = [diff for diff in difference if diff > 0]
@@ -172,7 +173,7 @@ class GalyleoDataServer:
         Returns:
             The subset of self.get_rows() which pass the filter
         '''
-        filter = Filter(filter_spec, self._column_names)
-        return filter.filter(self.get_row())
+        filter = Filter(filter_spec, self._column_names())
+        return filter.filter(self.get_rows())
 
 
