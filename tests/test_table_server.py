@@ -29,11 +29,122 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from galyleo.galyleo_table_server import Filter, GalyleoDataServer
+from tabnanny import check
+from galyleo.galyleo_table_server import Filter, GalyleoDataServer, check_valid_spec
 from galyleo.galyleo_constants import GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
 from galyleo.galyleo_exceptions import InvalidDataException
 import pytest
 import pandas as pd
+
+def test_check_filter():
+    # type of argument test
+    for test_var in [[], set(), ['a', 'b', 'c'], 'a', 1, None]:
+        with pytest.raises(InvalidDataException, match=f'filter_spec must be a dictionary, not {type(test_var)}'):
+            check_valid_spec(test_var)
+    no_operator_spec = {'foo': 'bar'}
+    with pytest.raises(InvalidDataException, match=f'There is no operator in {no_operator_spec}'):
+        check_valid_spec(no_operator_spec)
+    no_operator_spec = {'operator': 'bar'}    
+    valid_operators = {'AND', 'OR', 'NOT', 'IN_LIST', 'IN_RANGE'}
+    with pytest.raises(InvalidDataException, match=f'bar is not a valid operator.  Valid filter operators are {valid_operators}'):
+        check_valid_spec(no_operator_spec)
+    bad_fields = [
+        ({'operator': 'AND'}, {'arguments'}),
+        ({'operator': 'AND', 'foo': 'bar'}, {'arguments'}),
+        ({'operator': 'AND', 'values': [1,2]}, { 'arguments'}),
+        ({'operator': 'AND', 'argument': [1,2]}, {'arguments'}),
+        ({'operator': 'OR'}, {'arguments'}),
+        ({'operator': 'OR', 'foo': 'bar'}, {'arguments'}),
+        ({'operator': 'OR', 'values': [1,2]}, {'arguments'}), 
+        ({'operator': 'OR', 'argument': [1,2]}, {'arguments'}),
+        ({'operator': 'NOT'},  {'argument'}),
+        ({'operator': 'NOT', 'foo': 'bar'},  {'argument'}),
+        ({'operator': 'NOT', 'values': [1,2]},  {'argument'}),
+        ({'operator': 'NOT', 'arguments': [1,2]},  {'argument'}),
+        ({'operator': 'IN_RANGE'}, {'column', 'max_val', 'min_val'}),
+        ({'operator': 'IN_RANGE', 'max_val': 10, 'min_val': 5}, {'column'}),
+        ({'operator': 'IN_RANGE', 'column': 'a'}, {'max_val, min_val'}), 
+        ({'operator': 'IN_RANGE', 'column': 'a', 'max_val': 10}, {'min_val'}),
+        ({'operator': 'IN_RANGE', 'column': 'a', 'min_val': 10}, {'max_val'}),
+        ({'operator': 'IN_LIST'}, {'column', 'values'}),
+        ({'operator': 'IN_LIST', 'column': 'bar'}, {'column'}),
+        ({'operator': 'IN_LIST', 'values': [1,2]}, {'column'}),
+    ]
+    for spec in bad_fields:
+         with pytest.raises(InvalidDataException, match='is missing required fields'):
+             check_valid_spec(spec[0])
+    # Do a bad list test for AND/OR
+    with pytest.raises(InvalidDataException, match=f'The arguments field for AND must be a list, not {type({"a": "b"})}'):
+        check_valid_spec({"operator": 'AND', "arguments": {"a": "b"}})
+    
+    
+    good_spec = {"operator": "IN_RANGE", "min_val": 0, "max_val": 10, "column": "a"}
+    bad_spec = {"operator": "IN_RANGE", "min_val": 0, "max_val": 10}
+    # first, make sure this is OK with two good specs
+    check_valid_spec({"operator": "AND", "arguments": [good_spec, good_spec]})
+    with pytest.raises(InvalidDataException, match='is missing required fields'):
+        check_valid_spec({"operator": "AND", "arguments": [good_spec, bad_spec]})
+    check_valid_spec({"operator": "NOT", "argument": good_spec})
+    with pytest.raises(InvalidDataException, match='is missing required fields'):
+        check_valid_spec({"operator": "NOT", "argument": bad_spec})
+    check_valid_spec(good_spec)
+    bad_spec['column'] = 1
+    # make sure ints are valid column names
+    check_valid_spec(bad_spec)
+    # Check bad column types
+    for column_val in [1.0, None, {"a"}, {"a": "b"}]:
+        bad_spec['column'] = column_val
+        with pytest.raises(InvalidDataException, match=f'The column argument to IN_RANGE must be a string or an int, not {type(bad_spec["column"])}'):
+            check_valid_spec(bad_spec)
+    # Check bad lists
+    good_list = [1, 2, 3, 4]
+    bad_lists = [None, {}, {"a": "b"}, '1', 3]
+    good_list_spec = {"operator": "IN_LIST", "column": "a", "values": good_list}
+    check_valid_spec(good_list_spec)
+    for bad_list in bad_lists:
+        with pytest.raises(InvalidDataException, match = f'The Values argument to IN_LIST must be a list, not {type(bad_list)}'):
+            check_valid_spec({"operator": "IN_LIST", "column": "a", "values": bad_list})
+    # lists with bad types:
+    bad_lists = [[None], [[1, 2], 1], [(1, 2), "a"], [{1,2}], [{"s": "p"}]]
+    check_valid_spec({"operator": "IN_LIST", "column": "a", "values": []})
+    for bad_list in bad_lists:
+        with pytest.raises(InvalidDataException, match = 'Invalid Values'):
+            check_valid_spec({"operator": "IN_LIST", "column": "a", "values": bad_list})
+    good_ranges = [{"operator": "IN_RANGE", 'column': 'a', 'max_val': 20, 'min_val': 10}, {"operator": "IN_RANGE", 'column': 'b', 'max_val': 1.0, 'min_val': -0.3}]
+    bad_ranges = [
+        {"operator": "IN_RANGE", 'column': 'b', 'max_val': 10, 'min_val': '-3'},
+        {"operator": "IN_RANGE", 'column': 'b', 'max_val': 10, 'min_val': None}
+    ]
+    for spec in good_ranges:
+        check_valid_spec(spec)
+    for bad_range in bad_ranges:
+        bad_type = type(bad_range['min_val'])
+        message = f'The type of min_val for IN_RANGE must be a number, not {bad_type}'
+        with pytest.raises(InvalidDataException, match=message):
+            check_valid_spec(bad_range)
+    # Make sure recursion works well with good arguments:
+    spec1 = {"operator": 'AND', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
+    spec2 = {"operator": 'OR', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
+    spec3 = {"operator": 'NOT', 'argument':  good_list_spec}
+    spec4 = {"operator": 'AND', 'arguments': [spec1, good_list_spec]}
+    spec5 = {"operator": 'OR', 'arguments': [spec1, spec4]}
+    spec6 = {"operator": 'NOT', 'argument': spec5}
+    good_specs = [spec1, spec2, spec3, spec4, spec5, spec6]
+    for spec in good_specs: check_valid_spec(spec)
+    bad_spec_1 = {'operator': 'NOT', 'argument': bad_ranges[0]}
+    bad_spec_2 = {'operator': 'AND', 'arguments': [bad_ranges[1], good_ranges[0]]}
+    bad_spec_3 = {'operator': 'OR', 'arguments': [bad_ranges[1], good_ranges[0]]}
+    bad_spec_4 = {'operator': 'AND', 'arguments': [spec1, bad_spec_1]}
+    bad_spec_5 = {'operator': 'OR', 'arguments': [spec2, bad_spec_4]}
+    bad_spec_6 = {'operator': 'NOT', 'argument': bad_spec_4}
+    bad_specs = [bad_spec_1, bad_spec_2, bad_spec_3, bad_spec_4, bad_spec_5, bad_spec_6]
+    for spec in bad_specs:
+        with pytest.raises(InvalidDataException):
+            check_valid_spec(spec)
+
+    
+    
+
 
 def test_in_list():
     filter_spec = {"operator": "IN_LIST", 'column': 'a', 'values': [1, 2, 3]}

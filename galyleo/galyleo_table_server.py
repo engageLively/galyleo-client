@@ -33,6 +33,71 @@ from galyleo.galyleo_constants import GALYLEO_NUMBER
 from galyleo.galyleo_exceptions import InvalidDataException
 
 
+def check_valid_spec(filter_spec):
+    '''
+    Class method which checks to make sure that a filter spec is valid.  
+    Does not return, but throws an InvalidDataException with an error message
+    if the filter spec is invalid
+    Arguments:
+        fitler_spec: spec to test for validity
+    '''
+    # Check to make sure filter_spec is a dictionary, and not something else
+    if type(filter_spec) != dict:
+        raise InvalidDataException(f'filter_spec must be a dictionary, not {type(filter_spec)}')
+    #
+    # Step 1: check to make sure there is an operator field, and that it's an operator we recognize
+    if ('operator' in filter_spec):
+        operator = filter_spec['operator']
+        valid_operators = {'AND', 'OR', 'NOT', 'IN_LIST', 'IN_RANGE'}
+        if (not (operator in valid_operators)):
+            raise InvalidDataException(f'{operator} is not a valid operator.  Valid filter operators are {valid_operators}')
+    else:
+        raise InvalidDataException(f'There is no operator in {filter_spec}')
+    # Check to make sure that the fields are right for the operator that was given
+    # We don't throw an error for extra fields, just for missing fields. Since we're
+    # going to use keys() to get the fields in the spec, and this will include the 
+    # operator, 'operator' is one of the fields
+    fields = {
+        'AND': {'arguments', 'operator'},
+        'OR': {'arguments', 'operator'},
+        'NOT': {'argument', 'operator'},
+        'IN_LIST': {'column', 'values', 'operator'},
+        'IN_RANGE': {'column', 'max_val', 'min_val', 'operator'}
+    }
+    fields_in_spec = set(filter_spec.keys())
+    missing_fields = fields[operator] - fields_in_spec
+    if (len(missing_fields) > 0):
+        raise InvalidDataException(f'{filter_spec} is missing required fields {missing_fields}')
+    # For AND and OR, recursively check the arguments list and return
+    if (operator in {'AND', 'OR'}):
+        if (type(filter_spec['arguments']) != list):
+            raise InvalidDataException(f'The arguments field for {operator} must be a list, not {type(filter_spec["arguments"])}')
+        for arg in filter_spec['arguments']:
+            check_valid_spec(arg)
+        return
+    # For NOT, recursively check the argument field
+    elif (operator == 'NOT'):
+        check_valid_spec(filter_spec['argument'])
+        return
+    # if we get here, it's IN_LIST or IN_RANGE.  For both, check that the column is a string
+    if (not type(filter_spec['column']) in {str, int}):
+        raise InvalidDataException(f'The column argument to {operator} must be a string or an int, not {type(filter_spec["column"])}')
+    # For IN_LIST, check that the values argument is a list and each item is a string or number
+    if (operator == 'IN_LIST'):
+        values_type = type(filter_spec['values'])
+        if (values_type == list):
+            invalid = [value  for value in filter_spec['values'] if not type(value) in {str, float, int}]
+            if (len(invalid) > 0):
+                raise InvalidDataException(f'Invalid Values {invalid} for IN_LIST')
+        else:
+            raise InvalidDataException(f'The Values argument to IN_LIST must be a list, not {values_type}')
+    else:
+        # For IN_RANGE, make sure max_val and min_val are numbers
+        for field in {'max_val', 'min_val'}:
+            if (not type(filter_spec[field]) in {int, float} ):
+                raise InvalidDataException(f'The type of {field} for IN_RANGE must be a number, not {type(filter_spec[field])}')
+
+
 class Filter:
     '''
     A Class which implements a Filter used by VirtualGalyleoTable to filter rows.
