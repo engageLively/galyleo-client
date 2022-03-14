@@ -68,14 +68,14 @@ class GalyleoServerFramework:
 
         
     def get_filtered_rows(self):
-        parameters = request.get_json()
+        parameters = request.form
         if 'table_name' in parameters:
             server = self._get_table_server(parameters['table_name'])
             if 'filter_spec' in parameters:
                 try:
-                    filter_spec = parameters['filter_spec']
+                    filter_spec = loads(parameters['filter_spec'])
                     check_valid_spec(filter_spec)
-                    return server.get_filtered_rows(filter_spec)
+                    return dumps(server.get_filtered_rows(filter_spec))
                 except InvalidDataException as e:
                     abort(400, e)
             else:
