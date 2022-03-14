@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="galyleo",  # This is what you pip install it as.
-    version="2021.05.23",
+    version="2022.03.17",
     author="engageLively, inc",
     author_email="rick.mcgeer@engagelively.com",
     description="A client to exchange Galyleo tables and data with a JupyterLab front end",
@@ -17,7 +17,8 @@ setuptools.setup(
       'pandas',
       'numpy',
       'gviz-api',
-      'ipykernel'
+      'ipykernel',
+      'flask'
       ],
   classifiers=[
         "Programming Language :: Python :: 3",
