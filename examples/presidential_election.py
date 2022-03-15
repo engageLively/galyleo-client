@@ -28,6 +28,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+'''
+A simple example application showing how to use the GalyleoServerFramework to serve the tables in the presidential
+election dashboard.  To run this, make sure that FLASK_APP is set to presidential_election.py in the environment
+'''
 import sys
 import typing_extensions
 sys.path.append('..')
