@@ -34,14 +34,21 @@ election dashboard.  To run this, make sure that FLASK_APP is set to presidentia
 '''
 import sys
 import typing_extensions
-sys.path.append('..')
+
 from galyleo.galyleo_server_framework import GalyleoServerFramework
 from galyleo.galyleo_table_server import GalyleoDataServer
 from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING 
 import pandas as pd
 from flask import Flask
+from flask_cors import CORS
 
 class ServeFromPandas:
+    '''
+    A very simple class which reads a csv file into  a pandas dataframe assigns types to each column, and then has a simple
+    get_rows() function which converts the dataframe into a list of lists.
+    Parameters:
+        spec: a pair (<path to csv_file>, <list of types>), where the kth type is the galyleo type of column k 
+    '''
     def __init__(self, spec):
         file_name = spec[0]
         galyleo_types = spec[1]
@@ -53,10 +60,17 @@ class ServeFromPandas:
         self.types = galyleo_types
 
     def get_rows(self):
+        '''
+        Implement the get_rows() function as required by the API
+        '''
         return self.dataframe.to_numpy().tolist()
 
 app = Flask(__name__)
+CORS(app)
 
+#
+# The framework implements all the routes for the app
+#
 framework = GalyleoServerFramework(app)
 
 tables = {
@@ -66,7 +80,13 @@ tables = {
     'presidential_margins': ('presidential_margins.csv', [GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER]),
     'presidential_vote_history': ('presidential_vote_history.csv', [GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER])
 }
+#
+# Create the tables with the spec and register them with the framework
+#
 for table in tables:
     server = ServeFromPandas(tables[table])
     framework.add_table_server(table, server.server)
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8080, debug=True)
     
