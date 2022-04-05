@@ -39,7 +39,7 @@ import typing_extensions
 from galyleo.galyleo_table_server import GalyleoDataServer
 from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING 
 import pandas as pd
-from flask import Blueprint
+from flask import Flask
 from flask_cors import CORS
 from galyleo.galyleo_server_framework import galyleo_server_blueprint, add_table_server
 
