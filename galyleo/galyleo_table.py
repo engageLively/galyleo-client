@@ -89,7 +89,7 @@ class GalyleoTable:
 
     #
     # Check that a schema expressed as a list of tuples (name, type)
-    # matches a list of rows given as data.  We let gviz_api do teh 
+    # matches a list of rows given as data.  We let gviz_api do the 
     # checking for us.
     # Schema is a list of pairs [(<column_name>, <column_type>)]
     # where column_type is one of GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,

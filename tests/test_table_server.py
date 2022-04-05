@@ -1,6 +1,6 @@
 # BSD 3-Clause License
 
-# Copyright (c) 2019-2021, engageLively
+# Copyright (c) 2019-2022, engageLively
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -141,9 +141,6 @@ def test_check_filter():
     for spec in bad_specs:
         with pytest.raises(InvalidDataException):
             check_valid_spec(spec)
-
-    
-    
 
 
 def test_in_list():

@@ -35,12 +35,13 @@ election dashboard.  To run this, make sure that FLASK_APP is set to presidentia
 import sys
 import typing_extensions
 
-from galyleo.galyleo_server_framework import GalyleoServerFramework
+
 from galyleo.galyleo_table_server import GalyleoDataServer
 from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING 
 import pandas as pd
-from flask import Flask
+from flask import Blueprint
 from flask_cors import CORS
+from galyleo.galyleo_server_framework import galyleo_server_blueprint, add_table_server
 
 class ServeFromPandas:
     '''
@@ -67,11 +68,8 @@ class ServeFromPandas:
 
 app = Flask(__name__)
 CORS(app)
+app.register_blueprint(galyleo_server_blueprint)
 
-#
-# The framework implements all the routes for the app
-#
-framework = GalyleoServerFramework(app)
 
 tables = {
     'electoral_college': ('electoral_college.csv', [GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER, GALYLEO_NUMBER]),
@@ -85,7 +83,7 @@ tables = {
 #
 for table in tables:
     server = ServeFromPandas(tables[table])
-    framework.add_table_server(table, server.server)
+    add_table_server(table, server.server)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
