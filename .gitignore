@@ -1,0 +1,9 @@
+
+*.pyc
+dist/galyleo-2022.4.5-py3-none-any.whl
+dist/galyleo-2022.4.5.tar.gz
+galyleo.egg-info/dependency_links.txt
+galyleo.egg-info/PKG-INFO
+galyleo.egg-info/requires.txt
+galyleo.egg-info/SOURCES.txt
+galyleo.egg-info/top_level.txt

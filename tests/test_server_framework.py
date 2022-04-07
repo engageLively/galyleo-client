@@ -93,20 +93,25 @@ def test_server_framework():
     client = app.test_client()
     galyleo_response = client.get('/hello')
     assert galyleo_response.status == '200 OK'
+    # headers= Headers({"table_name": TABLE_NAME})
+    headers = {"table_name": TABLE_NAME}
     
-    galyleo_response = client.get(f'{make_get_prefix("get_all_values")}&column_name=Year')
+    # galyleo_response = client.get(f'{make_get_prefix("get_all_values")}&column_name=Year', )
+    galyleo_response = client.get('/get_all_values?column_name=Year', headers = headers)
     assert galyleo_response.status == '200 OK'
     result = loads(galyleo_response.get_data(as_text = True))
     expected = [year for year in range(1828, 2021, 4)]
     assert(result == expected)
-    galyleo_response = client.get(f'{make_get_prefix("get_numeric_spec")}&column_name=Year')
+    # galyleo_response = client.get(f'{make_get_prefix("get_numeric_spec")}&column_name=Year')
+    galyleo_response = client.get('/get_numeric_spec?column_name=Year', headers = headers)
     assert galyleo_response.status == '200 OK'
     expected = {"max_val": 2020, "min_val": 1828, "increment": 4}
     result = loads(galyleo_response.get_data(as_text = True))
     assert(result == expected)
     spec = {'operator': 'IN_RANGE', 'max_val': 1980, 'min_val': 1960, 'column': 'Year'}
-    data=dumps({'table_name': TABLE_NAME, 'filter_spec': spec})
-    galyleo_response = client.post('/get_filtered_rows', data = data, content_type='application/json')
+    # data=dumps({'table_name': TABLE_NAME, 'filter_spec': spec})
+    data=dumps({'filter_spec': spec})
+    galyleo_response = client.post('/get_filtered_rows', data = data, content_type='application/json', headers = headers)
     assert galyleo_response.status == '200 OK'
     expected = [row for row in presidential_vote_rows() if row[0] >= 1960 and row[0] <= 1980]
     response = galyleo_response.get_data(as_text = True)
