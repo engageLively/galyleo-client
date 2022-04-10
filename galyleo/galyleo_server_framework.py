@@ -28,12 +28,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
+
 import json
 from os import lseek
 from flask import Blueprint, request, abort, jsonify
 from galyleo.galyleo_exceptions import InvalidDataException
 from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
-from json import loads, dumps
+import logging
+
 '''
 A framework to easily and quickly implement a web server which serves tables according to 
 the Galyleo URL protocol.  This implements the URL methods get_filtered_rows, get_all_values,
@@ -96,11 +99,15 @@ def _get_table_server(request_api):
     try:
         table_signature = _get_table_key(table_name, dashboard_name)
     except InvalidDataException:
-        abort(400, f'No table name specified for {request_api}')
+        message = f'No table name specified for {request_api}'
+        logging.error(message)
+        abort(400, message)
     try:
         return table_servers[table_signature]
     except KeyError:
-        abort(400, f'No handler defined for table {table_signature} for request {request_api}')
+        message = f'No handler defined for table {table_signature} for request {request_api}'
+        logging.error(message)
+        abort(400, message)
 
 
 def _check_required_parameters(handle, parameter_set):
@@ -132,7 +139,7 @@ def echo_headers():
     result = {}
     for key in request.headers.keys():
         result[key] = request.headers[key]
-    return dumps(result)
+    return jsonify(result)
 
 @galyleo_server_blueprint.route('/echo_post', methods=['POST'])
 def echo_post():
@@ -140,6 +147,7 @@ def echo_post():
     Echo the request
     '''
     return jsonify(request.json)
+
 
 @galyleo_server_blueprint.route('/get_filtered_rows', methods=['POST'])    
 def get_filtered_rows():
@@ -164,11 +172,12 @@ def get_filtered_rows():
         try:
             filter_spec = parameters['filter_spec']
             check_valid_spec(filter_spec)
-            return dumps(server.get_filtered_rows(filter_spec))
+            return jsonify(server.get_filtered_rows(filter_spec))
         except InvalidDataException as e:
+            logging.error(e)
             abort(400, e)
     else:
-        return dumps(server.get_rows())
+        return jsonify(server.get_rows())
     
 
 @galyleo_server_blueprint.route('/get_numeric_spec')
@@ -184,9 +193,11 @@ def get_numeric_spec():
     server = _get_table_server('/get_numeric_spec')
     column_name = request.args.get('column_name')
     if (column_name != None):
-        return dumps(server.numeric_spec(column_name))
+        return jsonify(server.numeric_spec(column_name))
     else:
-        abort(400, '/get_numeric_spec requires a parameter "column_name"') 
+        message = '/get_numeric_spec requires a parameter "column_name"'
+        logging.error(message)
+        abort(400, message) 
 
 @galyleo_server_blueprint.route('/get_all_values')
 def get_all_values():
@@ -202,9 +213,11 @@ def get_all_values():
     server = _get_table_server('/get_all_values')
     column_name = request.args.get('column_name')
     if column_name != None:
-        return dumps(server.all_values(column_name))
+        return jsonify(server.all_values(column_name))
     else:
-        abort(400, '/get_numeric_spec requires a parameter "column_name"') 
+        message = '/get_numeric_spec requires a parameter "column_name"'
+        logging.error(message)
+        abort(400, message) 
     
 
 @galyleo_server_blueprint.route('/get_tables')    
