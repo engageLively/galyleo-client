@@ -5,3 +5,4 @@ gunicorn==20.1.0
 Flask-Cors==3.0.10
 pandas
 typing_extensions
+google-python-cloud-debugger

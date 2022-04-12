@@ -28,14 +28,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
 
-import json
-from os import lseek
+import logging
 from flask import Blueprint, request, abort, jsonify
 from galyleo.galyleo_exceptions import InvalidDataException
 from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
-import logging
+
+from json import JSONDecodeError, loads
 
 '''
 A framework to easily and quickly implement a web server which serves tables according to 
@@ -66,9 +65,9 @@ def _get_table_key(table_name, dashboard_name = None):
     Raises:
         InvalidDataException if table_name is None
     '''
-    if table_name == None:
+    if table_name is None:
         raise  InvalidDataException('table_name must be supplied')
-    return table_name if dashboard_name == None else (dashboard_name, table_name)
+    return table_name if dashboard_name is None else (dashboard_name, table_name)
 
 def add_table_server(table_name, galyleo_data_server, dashboard_name = None):
     '''
@@ -81,11 +80,20 @@ def add_table_server(table_name, galyleo_data_server, dashboard_name = None):
         dashboard_name: name of the dashboard (optional, None if not supplied)
     '''
     try:
-        assert galyleo_data_server != None, "galyleo_data_server cannot be None"
+        assert galyleo_data_server is not None, "galyleo_data_server cannot be None"
         assert isinstance(galyleo_data_server, GalyleoDataServer), f'galyleo_data_server must be an instance of GalyleoDataServer, not {type(galyleo_data_server)}'
-    except AssertionError as e:
-        raise InvalidDataException(e)
+    except AssertionError as assertion_error:
+        raise InvalidDataException from assertion_error
     table_servers[_get_table_key(table_name, dashboard_name)] = galyleo_data_server
+
+def _log_and_abort(message):
+    '''
+    Sent an abort with code 400 and log the error message.  Utility, internal use only
+    Parameters:
+        message: string with the message to be logged/sent
+    '''
+    logging.error(message)
+    abort(400, message)
 
 def _get_table_server(request_api):
     '''
@@ -99,15 +107,12 @@ def _get_table_server(request_api):
     try:
         table_signature = _get_table_key(table_name, dashboard_name)
     except InvalidDataException:
-        message = f'No table name specified for {request_api}'
-        logging.error(message)
-        abort(400, message)
+        _log_and_abort(f'No table name specified for {request_api}')
     try:
         return table_servers[table_signature]
     except KeyError:
-        message = f'No handler defined for table {table_signature} for request {request_api}'
-        logging.error(message)
-        abort(400, message)
+        _log_and_abort(f'No handler defined for table {table_signature} for request {request_api}')
+        
 
 
 def _check_required_parameters(handle, parameter_set):
@@ -123,59 +128,70 @@ def _check_required_parameters(handle, parameter_set):
     sent_parameters = set(request.args.keys())
     missing_parameters = parameter_set - sent_parameters
     if (len(missing_parameters) > 0):
-        abort(400, f'Missing arguments to {handle}: {missing_parameters}')
+        _log_and_abort(f'Missing arguments to {handle}: {missing_parameters}')
+        
 
 
-    
+
 @galyleo_server_blueprint.route('/hello')
 def hello():
     '''
     Just a simple get target to make sure that the framework is working
+    Parameters:
+       None
     '''
     return "hello"
 
 @galyleo_server_blueprint.route('/echo_headers', methods = ['POST', 'GET'])
 def echo_headers():
+    '''
+    Echo the headers back, for debugging
+    Parameters:
+        None
+    '''
     result = {}
     for key in request.headers.keys():
         result[key] = request.headers[key]
     return jsonify(result)
 
-@galyleo_server_blueprint.route('/echo_post', methods=['POST'])
-def echo_post():
-    '''
-    Echo the request
-    '''
-    return jsonify(request.json)
+# @galyleo_server_blueprint.route('/echo_post', methods=['POST'])
+# def echo_post():
+#     '''
+#     Echo the request
+#     '''
+#     return jsonify(request.json)
 
 
-@galyleo_server_blueprint.route('/get_filtered_rows', methods=['POST'])    
+@galyleo_server_blueprint.route('/get_filtered_rows', methods=['GET'])    
 def get_filtered_rows():
     '''
     Get the filtered rows from a request.  In the initializer, this
-    was registered for the /get_filtered_rows route.  Parses the
-    incoming request, which will be in a form, finds the table from
-    the table_name parameter and the filter_spec from the filter_spec
-    parameter, and calls server.get_filtered_rows() to return the
-    rows which match the filter.  If there is no filter_spec, returns
+    was registered for the /get_filtered_rows route.  Gets the filter_spec
+    from the Filter-Spec header variable If there is no filter_spec, returns
     all rows using server.get_rows().  Aborts with a 400 if there is no
     table_name, or if check_valid_spec or get_filtered_rows throws an
-    InvalidDataException.
+    InvalidDataException, or if the filter_spec is not valid JSON.
     Arguments:
         None
     Returns:
         The filtered rows as a JSONified list of lists
     '''
-    parameters = request.json
-    server = _get_table_server('get_filtered_rows')
-    if 'filter_spec' in parameters:
+    filter_spec = None
+    filter_spec_as_json = request.headers.get('Filter-Spec')
+    if filter_spec_as_json is not None:
         try:
-            filter_spec = parameters['filter_spec']
+            filter_spec = loads(filter_spec_as_json)
+        except JSONDecodeError as error:
+            _log_and_abort('Bad Filter Specification: ' + filter_spec_as_json + f'.  Error {error.msg} at position {pos}')
+            
+
+    server = _get_table_server('get_filtered_rows')
+    if filter_spec is not None:
+        try:
             check_valid_spec(filter_spec)
             return jsonify(server.get_filtered_rows(filter_spec))
-        except InvalidDataException as e:
-            logging.error(e)
-            abort(400, e)
+        except InvalidDataException as invalid_error:
+            _log_and_abort(invalid_error)
     else:
         return jsonify(server.get_rows())
     
@@ -187,17 +203,16 @@ def get_numeric_spec():
     in the call, and that table_name is registered, then returns the numeric spec {"min_val", "max_val", "increment"}
     as a JSONified dictionary.  Uses server.get_numeric_spec(column_name) to create the numeric spec.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
-    Parameters: 
+    Parameters:
             None
     '''
     server = _get_table_server('/get_numeric_spec')
     column_name = request.args.get('column_name')
-    if (column_name != None):
+    if (column_name is not None):
         return jsonify(server.numeric_spec(column_name))
     else:
-        message = '/get_numeric_spec requires a parameter "column_name"'
-        logging.error(message)
-        abort(400, message) 
+        _log_and_abort('/get_numeric_spec requires a parameter "column_name"')
+         
 
 @galyleo_server_blueprint.route('/get_all_values')
 def get_all_values():
@@ -206,20 +221,17 @@ def get_all_values():
     in the call, and that table_name is registered, then returns the distinct values a
     as a JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
-    Parameters: 
-            None
+    Parameters:
+        None
     '''
     
     server = _get_table_server('/get_all_values')
     column_name = request.args.get('column_name')
-    if column_name != None:
+    if column_name is not None:
         return jsonify(server.all_values(column_name))
     else:
-        message = '/get_numeric_spec requires a parameter "column_name"'
-        logging.error(message)
-        abort(400, message) 
-    
-
+        _log_and_abort('/get_numeric_spec requires a parameter "column_name"')
+        
 @galyleo_server_blueprint.route('/get_tables')    
 def get_tables():
     '''
@@ -232,4 +244,4 @@ def get_tables():
     result = {}
     for key in table_servers.keys():
         result[key] = table_servers[key].schema
-    return dumps(result)
+    return jsonify(result)

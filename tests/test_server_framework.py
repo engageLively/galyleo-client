@@ -30,13 +30,14 @@
 
 
 from urllib import response
-from galyleo.galyleo_server_framework import  galyleo_server_blueprint, add_table_server
-from galyleo.galyleo_table_server import GalyleoDataServer
+from json import loads, dumps
 import pytest
 import pandas as pd
 from flask import Flask, jsonify
 from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING
-from json import loads, dumps
+from galyleo.galyleo_server_framework import  galyleo_server_blueprint, add_table_server
+from galyleo.galyleo_table_server import GalyleoDataServer
+
 
 
 def presidential_vote_rows():
@@ -83,7 +84,7 @@ def make_get_prefix(route):
 
 def test_server_framework():
     '''
-    Test the server framework using the Blueprints strategy.  
+    Test the server framework using the Blueprints strategy.
     The functionality has already been tested, so this is just
     to make sure the responses come back correctly
     '''
@@ -94,7 +95,7 @@ def test_server_framework():
     galyleo_response = client.get('/hello')
     assert galyleo_response.status == '200 OK'
     # headers= Headers({"table_name": TABLE_NAME})
-    headers = {"table_name": TABLE_NAME}
+    headers = {"Table-Name": TABLE_NAME}
     
     # galyleo_response = client.get(f'{make_get_prefix("get_all_values")}&column_name=Year', )
     galyleo_response = client.get('/get_all_values?column_name=Year', headers = headers)
@@ -110,8 +111,10 @@ def test_server_framework():
     assert(result == expected)
     spec = {'operator': 'IN_RANGE', 'max_val': 1980, 'min_val': 1960, 'column': 'Year'}
     # data=dumps({'table_name': TABLE_NAME, 'filter_spec': spec})
-    data=dumps({'filter_spec': spec})
-    galyleo_response = client.post('/get_filtered_rows', data = data, content_type='application/json', headers = headers)
+    # data=dumps({'filter_spec': spec})
+    # galyleo_response = client.get('/get_filtered_rows', data = data, content_type='application/json', headers = headers)
+    headers ['Filter-Spec'] = dumps(spec)
+    galyleo_response = client.get('/get_filtered_rows', headers = headers)
     assert galyleo_response.status == '200 OK'
     expected = [row for row in presidential_vote_rows() if row[0] >= 1960 and row[0] <= 1980]
     response = galyleo_response.get_data(as_text = True)

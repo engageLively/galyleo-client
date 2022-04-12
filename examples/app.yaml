@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-runtime: python39
+runtime: python38
 entrypoint: gunicorn -w 2 presidential_election:app

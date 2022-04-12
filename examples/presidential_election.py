@@ -41,6 +41,13 @@ import pandas as pd
 from flask import Flask
 from flask_cors import CORS
 from galyleo.galyleo_server_framework import galyleo_server_blueprint, add_table_server
+try:
+  import googleclouddebugger
+  googleclouddebugger.enable(
+    breakpoint_enable_canary=True
+  )
+except ImportError:
+  pass
 
 class ServeFromPandas:
     '''
