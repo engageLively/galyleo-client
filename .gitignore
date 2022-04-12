@@ -8,3 +8,4 @@ galyleo.egg-info/requires.txt
 galyleo.egg-info/SOURCES.txt
 galyleo.egg-info/top_level.txt
 *.pyc
+examples/__pycache__/presidential_election.cpython-310.pyc
