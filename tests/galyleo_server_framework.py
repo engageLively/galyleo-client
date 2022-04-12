@@ -31,7 +31,7 @@
 from flask import Flask, request, abort
 from galyleo.galyleo_exceptions import InvalidDataException
 from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
-from json import loads, dumps
+
 
 
 '''
