@@ -30,9 +30,12 @@
 
 
 import logging
+
+from pyparsing import col
 from flask import Blueprint, request, abort, jsonify
 from galyleo.galyleo_exceptions import InvalidDataException
 from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
+from galyleo.galyleo_constants import GALYLEO_NUMBER
 from json import JSONDecodeError, loads
 
 '''
@@ -67,6 +70,22 @@ def _get_table_key(table_name, dashboard_name = None):
     if table_name is None:
         raise  InvalidDataException('table_name must be supplied')
     return table_name if dashboard_name is None else (dashboard_name, table_name)
+
+def _get_all_tables(dashboard_name = None):
+    '''
+    Get all the tables for a dashboard, or, if dashboard_name is None, all the tables.  This is to support a
+    request for a numeric_spec or all_values for a column name when the table_name is not specified. In this case,
+    all tables will be searched for this column name
+    Parameters:
+        dashboard_name: name of the dashboard
+    Returns:
+        a list of all tables in the dashboard
+    '''
+    if dashboard_name is not None:
+        keys = [key for key in table_servers.keys() if key[0] == dashboard_name]
+        return [table_servers[key] for key in keys]
+    else:
+        return table_servers.values()
 
 def add_table_server(table_name, galyleo_data_server, dashboard_name = None):
     '''
@@ -105,6 +124,41 @@ def _get_table_server(request_api):
     dashboard_name = request.headers.get('Dashboard_Name')
     try:
         table_signature = _get_table_key(table_name, dashboard_name)
+        try:
+            return table_servers[table_signature]
+        except KeyError:
+            _log_and_abort(f'No handler defined for table {table_signature} for request {request_api}')
+    except InvalidDataException as error:
+        _log_and_abort(f'{error} to {request_api}')
+
+
+def _get_table_servers(request_api):
+    '''
+    Internal use.  Get the server for a specific table_name, or all servers if the name is null.
+    Aborts the request with a 400 if the table isn't found.
+    Parameters:
+        request_api: api  of the request
+    '''
+    
+    table_name = request.headers.get('Table-Name')
+    dashboard_name = request.headers.get('Dashboard_Name')
+    if table_name is not None:
+        table_signature = _get_table_key(table_name, dashboard_name)
+        try:
+            return [table_servers[table_signature]]
+        except KeyError:
+            _log_and_abort(f'No handler defined for table {table_signature} for request {request_api}')
+    else:
+        tables = _get_all_tables(dashboard_name)
+        if (len(tables) == 0):
+            message = 'No tables found' if dashboard_name is None else f'No tables found for {dashboard_name}'
+            message = message + f' for request {request_api}'
+            _log_and_abort(message)
+        else:
+            return tables
+
+    try:
+        table_signature = _get_table_key(table_name, dashboard_name)
     except InvalidDataException:
         _log_and_abort(f'No table name specified for {request_api}')
     try:
@@ -112,8 +166,6 @@ def _get_table_server(request_api):
     except KeyError:
         _log_and_abort(f'No handler defined for table {table_signature} for request {request_api}')
         
-
-
 def _check_required_parameters(handle, parameter_set):
     '''
     Check to make sure the required parameters are in the parameter set
@@ -129,8 +181,6 @@ def _check_required_parameters(handle, parameter_set):
     if (len(missing_parameters) > 0):
         _log_and_abort(f'Missing arguments to {handle}: {missing_parameters}')
         
-
-
 
 @galyleo_server_blueprint.route('/hello')
 def hello():
@@ -193,22 +243,43 @@ def get_filtered_rows():
             _log_and_abort(invalid_error)
     else:
         return jsonify(server.get_rows())
-    
+
+def _is_numeric_column(table_server, column_name):
+    '''
+    Internal use only.  Returns True iff the table_server has a column with name column_name, and if the type is
+    GALYLEO_NUMBER
+    Parameters:
+        table_server: the table server to check
+        column_name: the name of the column_name
+    '''
+    column_type = table_server.get_column_type(column_name)
+    return column_type is not None and column_type == GALYLEO_NUMBER
+
 
 @galyleo_server_blueprint.route('/get_numeric_spec')
 def get_numeric_spec():
     '''
-    Target for the /get_numeric_spec route.  Makes sure that table_name and column_name are specified
-    in the call, and that table_name is registered, then returns the numeric spec {"min_val", "max_val", "increment"}
+    Target for the /get_numeric_spec route.  Makes sure that column_name is specified
+    in the call, and that if table_name is present, it is registered, then returns the numeric spec {"min_val", "max_val", "increment"}
     as a JSONified dictionary.  Uses server.get_numeric_spec(column_name) to create the numeric spec.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
     Parameters:
             None
     '''
-    server = _get_table_server('/get_numeric_spec')
+
+    servers = _get_table_servers('/get_numeric_spec')
     column_name = request.args.get('column_name')
     if (column_name is not None):
-        return jsonify(server.numeric_spec(column_name))
+        matching_servers = [server for server in servers if _is_numeric_column(server, column_name)]
+        if (len(matching_servers) == 0):
+            _log_and_abort(f'/get_numeric_spec found no numeric columns of name {column_name}')
+        spec = matching_servers[0].numeric_spec(column_name)
+        for server in matching_servers[1:]:
+            serv_spec = server.numeric_spec(column_name)
+            spec["max_val"] = max(spec["max_val"], serv_spec["max_val"])
+            spec["min_val"] = min(spec["min_val"], serv_spec["min_val"])
+            spec["increment"] = min(spec["increment"], serv_spec["increment"])
+        return jsonify(spec)
     else:
         _log_and_abort('/get_numeric_spec requires a parameter "column_name"')
          
@@ -216,20 +287,31 @@ def get_numeric_spec():
 @galyleo_server_blueprint.route('/get_all_values')
 def get_all_values():
     '''
-    Target for the /get_all_values route.  Makes sure that table_name and column_name are specified
-    in the call, and that table_name is registered, then returns the distinct values a
+    Target for the /get_all_values route.  Makes sure that column_name is specified
+    in the call, and that if table_name is present, it is registered, then returns the distinct values a
     as a JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
     Parameters:
         None
     '''
     
-    server = _get_table_server('/get_all_values')
+    servers = _get_table_servers('/get_numeric_spec')
     column_name = request.args.get('column_name')
     if column_name is not None:
-        return jsonify(server.all_values(column_name))
+        try:
+            matching_servers = [server for server in servers if server.get_column_type(column_name) is not None]
+            if (len(matching_servers) == 0):
+                _log_and_abort(f'/get_all_values found no  columns of name {column_name}')
+            values_set = set(matching_servers[0].all_values(column_name))
+            for server in matching_servers[1:]:
+                values_set = values_set.union(set(server.all_values(column_name)))
+            result = list(values_set)
+            result.sort()
+            return jsonify(result)
+        except InvalidDataException as error:
+            _log_and_abort(f'Error in get_all_values for column {column_name}: {error}')
     else:
-        _log_and_abort('/get_numeric_spec requires a parameter "column_name"')
+        _log_and_abort('/get_all_values requires a parameter "column_name"')
         
 @galyleo_server_blueprint.route('/get_tables')    
 def get_tables():

@@ -187,6 +187,18 @@ class GalyleoDataServer:
 
     def _column_names(self):
         return [column["name"] for column in self.schema]
+
+    def get_column_type(self, column_name):
+        '''
+        Returns the type of column column_name, or None if this table doesn't have a column with that name.
+        Parameters:
+            column_name: name of the column to get the type for
+        '''
+        matches = [column["type"] for column in self.schema if column["name"] == column_name]
+        if (len(matches) == 0):
+            return None
+        else:
+            return matches[0]
     
 
     def all_values(self, column_name:str):
