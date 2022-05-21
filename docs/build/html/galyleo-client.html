@@ -45,6 +45,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-galyleo.galyleo_jupyterlab_client">JupyterLab Client</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-galyleo.galyleo_exceptions">Galyleo Exceptions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-galyleo.galyleo_constants">Galyleo Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galyleo.galyleo_table_server">Galyleo Table Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-galyleo.galyleo_server_framework">Galyleo Server Framework</a></li>
 </ul>
 </li>
 </ul>
@@ -463,6 +465,199 @@ or a bad schema is specified, or a table row is the wrong length, or..</p>
 <dt class="sig sig-object py" id="galyleo.galyleo_constants.MAX_DATA_SIZE">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_constants.</span></span><span class="sig-name descname"><span class="pre">MAX_DATA_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16777216</span></em><a class="headerlink" href="#galyleo.galyleo_constants.MAX_DATA_SIZE" title="Permalink to this definition"></a></dt>
 <dd><p>Maximum number of rows in a table</p>
+</dd></dl>
+
+</section>
+<section id="module-galyleo.galyleo_table_server">
+<span id="galyleo-table-server"></span><h2>Galyleo Table Server<a class="headerlink" href="#module-galyleo.galyleo_table_server" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.Filter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.Filter" title="Permalink to this definition"></a></dt>
+<dd><p>A Class which implements a Filter used by VirtualGalyleoTable to filter rows.
+The arguments to the contstructor are a filterSpec, which is a boolean tree 
+of filters and the columns which the filter is implemented over. 
+Note that there is no error-checking here: it is assumed that the dashboard
+widgets will only select columns which appear in the tables, of the right type,
+and so on. 
+This is designed to be instantiated from VirtualGalyleoTable.get_filtered_rows()
+and in no other place – error checking, if any, should be done there.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>filter_spec: a Specification of the filter as a dictionary.
+columns: the names of the columns (names alone, not types)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.Filter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.Filter.filter" title="Permalink to this definition"></a></dt>
+<dd><p>Filter the rows according to the specification given to the constructor.
+Returns the rows for which the filter returns True.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>rows: list of list of values, in the same order as the columns</p>
+</dd>
+<dt>Returns:</dt><dd><p>subset of the rows, which pass the filter</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">GalyleoDataServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_rows</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer" title="Permalink to this definition"></a></dt>
+<dd><p>A Galyleo Data Server: This is instantiated with a function get_rows() which  delivers the rows, rather 
+than having them explicitly in the Table.  Note that get_rows() <em>must</em> return the approrpiate number of columns
+of the appropriate types</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.all_values">
+<span class="sig-name descname"><span class="pre">all_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.all_values" title="Permalink to this definition"></a></dt>
+<dd><p>get all the values from column_name</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>column_name: name of the column to get the values for</p>
+</dd>
+<dt>Returns:</dt><dd><p>List of the values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.get_column_type">
+<span class="sig-name descname"><span class="pre">get_column_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.get_column_type" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the type of column column_name, or None if this table doesn’t have a column with that name.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>column_name: name of the column to get the type for</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.get_filtered_rows">
+<span class="sig-name descname"><span class="pre">get_filtered_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.get_filtered_rows" title="Permalink to this definition"></a></dt>
+<dd><p>Filter the rows according to the specification given by filter_spec.
+Returns the rows for which the resulting filter returns True.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>filter_spec: Specification of the filter, as a dictionary</p>
+</dd>
+<dt>Returns:</dt><dd><p>The subset of self.get_rows() which pass the filter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.numeric_spec">
+<span class="sig-name descname"><span class="pre">numeric_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.numeric_spec" title="Permalink to this definition"></a></dt>
+<dd><p>get the dictionary {min_val, max_val, increment} for column_name</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>column_name: name of the column to get the numeric spec for</p>
+</dd>
+<dt>Returns:</dt><dd><p>the minimum, maximum, and increment of the column</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.check_valid_spec">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">check_valid_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.check_valid_spec" title="Permalink to this definition"></a></dt>
+<dd><p>Class method which checks to make sure that a filter spec is valid.  
+Does not return, but throws an InvalidDataException with an error message
+if the filter spec is invalid</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>filter_spec: spec to test for validity</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-galyleo.galyleo_server_framework">
+<span id="galyleo-server-framework"></span><h2>Galyleo Server Framework<a class="headerlink" href="#module-galyleo.galyleo_server_framework" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.add_table_server">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">add_table_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galyleo_data_server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashboard_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.add_table_server" title="Permalink to this definition"></a></dt>
+<dd><p>Register a GalyleoDataServer to serve data for a specific table name, and, optionally, dashboard_name
+if it is supplied.   Raises an InvalidDataException if table_name is None or galyleo_data_server is None
+or is not an instance of GalyleoDataServer</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>table_name: name to register the server for
+galyleo_data_server: an instange of GalyleoDataServer which services the requests
+dashboard_name: name of the dashboard (optional, None if not supplied)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.echo_headers">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">echo_headers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.echo_headers" title="Permalink to this definition"></a></dt>
+<dd><p>Echo the headers back, for debugging</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_all_values">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_all_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_all_values" title="Permalink to this definition"></a></dt>
+<dd><p>Target for the /get_all_values route.  Makes sure that column_name is specified
+in the call, and that if table_name is present, it is registered, then returns the distinct values a
+as a JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts
+with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_filtered_rows">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_filtered_rows</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_filtered_rows" title="Permalink to this definition"></a></dt>
+<dd><p>Get the filtered rows from a request.  In the initializer, this
+was registered for the /get_filtered_rows route.  Gets the filter_spec
+from the Filter-Spec header variable If there is no filter_spec, returns
+all rows using server.get_rows().  Aborts with a 400 if there is no
+table_name, or if check_valid_spec or get_filtered_rows throws an
+InvalidDataException, or if the filter_spec is not valid JSON.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+<dt>Returns:</dt><dd><p>The filtered rows as a JSONified list of lists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_numeric_spec">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_numeric_spec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_numeric_spec" title="Permalink to this definition"></a></dt>
+<dd><p>Target for the /get_numeric_spec route.  Makes sure that column_name is specified
+in the call, and that if table_name is present, it is registered, then returns the numeric spec {“min_val”, “max_val”, “increment”}
+as a JSONified dictionary.  Uses server.get_numeric_spec(column_name) to create the numeric spec.  Aborts
+with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
+<dl class="simple">
+<dt>Arrguments:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_tables">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_tables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_tables" title="Permalink to this definition"></a></dt>
+<dd><p>Target for the /get_tables route.  Dumps a JSONIfied dictionary of the form:
+{table_name: &lt;table_schema&gt;}, where &lt;table_schema&gt; is a dictionary
+{“name”: name, “type”: type}</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.hello">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">hello</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.hello" title="Permalink to this definition"></a></dt>
+<dd><p>Just a simple get target to make sure that the framework is working</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

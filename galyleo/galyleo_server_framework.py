@@ -92,7 +92,8 @@ def add_table_server(table_name, galyleo_data_server, dashboard_name = None):
     Register a GalyleoDataServer to serve data for a specific table name, and, optionally, dashboard_name
     if it is supplied.   Raises an InvalidDataException if table_name is None or galyleo_data_server is None
     or is not an instance of GalyleoDataServer
-    Parameters:
+
+    Arguments:
         table_name: name to register the server for
         galyleo_data_server: an instange of GalyleoDataServer which services the requests
         dashboard_name: name of the dashboard (optional, None if not supplied)
@@ -107,7 +108,8 @@ def add_table_server(table_name, galyleo_data_server, dashboard_name = None):
 def _log_and_abort(message):
     '''
     Sent an abort with code 400 and log the error message.  Utility, internal use only
-    Parameters:
+
+    Arguments:
         message: string with the message to be logged/sent
     '''
     logging.error(message)
@@ -117,7 +119,8 @@ def _get_table_server(request_api):
     '''
     Internal use.  Get the server for a specific table_name and return it.
     Aborts the request with a 400 if the table isn't found.
-    Parameters:
+
+    Arguments:
         request_api: api  of the request
     '''
     table_name = request.headers.get('Table-Name')
@@ -136,7 +139,8 @@ def _get_table_servers(request_api):
     '''
     Internal use.  Get the server for a specific table_name, or all servers if the name is null.
     Aborts the request with a 400 if the table isn't found.
-    Parameters:
+
+    Arguments:
         request_api: api  of the request
     '''
     
@@ -172,7 +176,8 @@ def _check_required_parameters(handle, parameter_set):
     required for a request, aborting if they aren't. This can only be used
     with get requests, since it pulls this from the args multidict.
     This is designed for internal use only
-    Parameters:
+
+    Arguments:
         handle: the URL handle, for error reporting
         parameter_set: the set of parameters required
     '''
@@ -186,7 +191,8 @@ def _check_required_parameters(handle, parameter_set):
 def hello():
     '''
     Just a simple get target to make sure that the framework is working
-    Parameters:
+
+    Arguments:
        None
     '''
     return "hello"
@@ -195,7 +201,8 @@ def hello():
 def echo_headers():
     '''
     Echo the headers back, for debugging
-    Parameters:
+
+    Arguments:
         None
     '''
     result = {}
@@ -220,6 +227,7 @@ def get_filtered_rows():
     all rows using server.get_rows().  Aborts with a 400 if there is no
     table_name, or if check_valid_spec or get_filtered_rows throws an
     InvalidDataException, or if the filter_spec is not valid JSON.
+
     Arguments:
         None
     Returns:
@@ -248,7 +256,8 @@ def _is_numeric_column(table_server, column_name):
     '''
     Internal use only.  Returns True iff the table_server has a column with name column_name, and if the type is
     GALYLEO_NUMBER
-    Parameters:
+
+    Arguments:
         table_server: the table server to check
         column_name: the name of the column_name
     '''
@@ -263,7 +272,8 @@ def get_numeric_spec():
     in the call, and that if table_name is present, it is registered, then returns the numeric spec {"min_val", "max_val", "increment"}
     as a JSONified dictionary.  Uses server.get_numeric_spec(column_name) to create the numeric spec.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
-    Parameters:
+
+    Arrguments:
             None
     '''
 
@@ -291,7 +301,8 @@ def get_all_values():
     in the call, and that if table_name is present, it is registered, then returns the distinct values a
     as a JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts
     with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.
-    Parameters:
+
+    Arguments:
         None
     '''
     
@@ -319,7 +330,8 @@ def get_tables():
     Target for the /get_tables route.  Dumps a JSONIfied dictionary of the form:
     {table_name: <table_schema>}, where <table_schema> is a dictionary
     {"name": name, "type": type}
-    Parameters:
+
+    Arguments:
             None
     '''
     result = {}

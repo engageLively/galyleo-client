@@ -52,4 +52,14 @@ Galyleo Constants
 .. automodule:: galyleo.galyleo_constants
    :members:
 
+Galyleo Table Server
+--------------------
 
+.. automodule:: galyleo.galyleo_table_server
+   :members:
+
+Galyleo Server Framework
+---------------------------
+
+.. automodule:: galyleo.galyleo_server_framework
+   :members:

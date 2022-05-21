@@ -1,22 +1,16 @@
 # BSD 3-Clause License
-
 # Copyright (c) 2019-2022, engageLively
 # All rights reserved.
-
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-
 # 1. Redistributions of source code must retain the above copyright notice, this
 #    list of conditions and the following disclaimer.
-
 # 2. Redistributions in binary form must reproduce the above copyright notice,
 #    this list of conditions and the following disclaimer in the documentation
 #    and/or other materials provided with the distribution.
-
 # 3. Neither the name of the copyright holder nor the names of its
 #    contributors may be used to endorse or promote products derived from
 #    this software without specific prior written permission.
-
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,9 +32,11 @@ def check_valid_spec(filter_spec):
     Class method which checks to make sure that a filter spec is valid.  
     Does not return, but throws an InvalidDataException with an error message
     if the filter spec is invalid
+
     Arguments:
-        fitler_spec: spec to test for validity
+        filter_spec: spec to test for validity
     '''
+
     # Check to make sure filter_spec is a dictionary, and not something else
     if type(filter_spec) != dict:
         raise InvalidDataException(f'filter_spec must be a dictionary, not {type(filter_spec)}')
@@ -108,9 +104,10 @@ class Filter:
     and so on. 
     This is designed to be instantiated from VirtualGalyleoTable.get_filtered_rows()
     and in no other place -- error checking, if any, should be done there.
+
     Arguments:
-          filter_spec: a Specification of the filter as a dictionary.
-          columns: the names of the columns (names alone, not types)
+        filter_spec: a Specification of the filter as a dictionary.
+        columns: the names of the columns (names alone, not types)
     '''
     def __init__(self, filter_spec, columns):
         self.operator = filter_spec["operator"]
@@ -136,10 +133,11 @@ class Filter:
         '''
         Filter the rows according to the specification given to the constructor.
         Returns the rows for which the filter returns True.  
+
         Arguments:
-              rows: list of list of values, in the same order as the columns
+            rows: list of list of values, in the same order as the columns
         Returns:
-               subset of the rows, which pass the filter
+            subset of the rows, which pass the filter
         '''
         # Just an overlay on _filter_index, which returns the INDICES of the rows
         # which pass the filter.  This is the top-level call, _filter_index is recursive
@@ -191,7 +189,8 @@ class GalyleoDataServer:
     def get_column_type(self, column_name):
         '''
         Returns the type of column column_name, or None if this table doesn't have a column with that name.
-        Parameters:
+
+        Arguments:
             column_name: name of the column to get the type for
         '''
         matches = [column["type"] for column in self.schema if column["name"] == column_name]
@@ -204,10 +203,12 @@ class GalyleoDataServer:
     def all_values(self, column_name:str):
         '''
         get all the values from column_name
+
         Arguments:
             column_name: name of the column to get the values for
         Returns:
             List of the values
+
         '''
         try:
             index = self._column_names().index(column_name)
@@ -221,11 +222,11 @@ class GalyleoDataServer:
     def numeric_spec(self, column_name:str):
         '''
         get the dictionary {min_val, max_val, increment} for column_name
+        
         Arguments:
             column_name: name of the column to get the numeric spec for
         Returns:
             the minimum, maximum, and increment of the column
-
         '''
         entry = [column for column in self.schema if column["name"] == column_name]
         if (len(entry) == 0):
@@ -245,6 +246,7 @@ class GalyleoDataServer:
         '''
         Filter the rows according to the specification given by filter_spec.
         Returns the rows for which the resulting filter returns True.  
+
         Arguments:
             filter_spec: Specification of the filter, as a dictionary
         Returns:
