@@ -1,0 +1,238 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
+# GNU Make 4.3
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Sat May 21 15:47:42 2022
+
+# Variables
+
+# environment
+REMOTE_CONTAINERS_SOCKETS = ["/tmp/vscode-ssh-auth-d32dbea763162b70794340100c9814834e41cae8.sock"]
+# environment
+LC_ALL = C
+# environment
+VSCODE_CWD = /vscode/vscode-server/bin/linux-x64/57fd6d0195bb9b9d1b49f6da5db789060795de47
+# environment
+NVM_DIR = /usr/local/share/nvm
+# environment
+PYTHON_GET_PIP_URL = https://github.com/pypa/get-pip/raw/38e54e5de07c66e875c11a1ebbdb938854625dd8/public/get-pip.py
+# default
+MAKE_COMMAND := make
+# environment
+VSCODE_HANDLES_SIGPIPE = true
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# environment
+PWD = /workspaces/el-galyleo-client
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+HOSTNAME = 2115fffaf5ba
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+VSCODE_LOG_STACK = false
+# automatic
+%F = $(notdir $%)
+# environment
+NVM_INC = /usr/local/share/nvm/versions/node/v16.15.0/include/node
+# environment
+LANG = C
+# environment
+NVM_SYMLINK_CURRENT = true
+# default
+.LOADED := 
+# default
+.INCLUDE_DIRS = /usr/local/include /usr/include /usr/include
+# environment
+PROMPT_DIRTRIM = 4
+# makefile
+MAKEFLAGS = pqrR
+# makefile
+CURDIR := /workspaces/el-galyleo-client
+# environment
+VSCODE_PIPE_LOGGING = true
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+MFLAGS = -pqrR
+# environment
+SSH_AUTH_SOCK = /tmp/vscode-ssh-auth-d32dbea763162b70794340100c9814834e41cae8.sock
+# default
+.SHELLFLAGS := -c
+# environment
+NVM_BIN = /usr/local/share/nvm/versions/node/v16.15.0/bin
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+GPG_KEY = A035C8C19219BA821ECEA86B64E628F8D684696D
+# makefile
+MAKEFILE_LIST := 
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+PYTHON_PIP_VERSION = 22.0.4
+# environment
+PIPX_HOME = /usr/local/py-utils
+# automatic
+*F = $(notdir $*)
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en","availableLanguages":{}}
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# makefile
+SHELL = /bin/sh
+# default
+MAKECMDGOALS := all
+# environment
+SHLVL = 1
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+PATH = /vscode/vscode-server/bin/linux-x64/57fd6d0195bb9b9d1b49f6da5db789060795de47/bin/remote-cli:/usr/local/share/nvm/current/bin:/usr/local/bin:/usr/local/share/nvm/versions/node/v16.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/py-utils/bin:/home/vscode/.local/bin:/usr/local/py-utils/bin
+# default
+MAKEFILES := 
+# automatic
+^F = $(notdir $^)
+# environment
+VSCODE_LOG_NATIVE = false
+# environment
+REMOTE_CONTAINERS_IPC = /tmp/vscode-remote-containers-ipc-d32dbea763162b70794340100c9814834e41cae8.sock
+# environment
+REMOTE_CONTAINERS = true
+# automatic
+?F = $(notdir $?)
+# environment
+PIPX_BIN_DIR = /usr/local/py-utils/bin
+# environment
+LS_COLORS = 
+# automatic
++F = $(notdir $+)
+# environment
+PYTHON_SETUPTOOLS_VERSION = 58.1.0
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+BROWSER = /vscode/vscode-server/bin/linux-x64/57fd6d0195bb9b9d1b49f6da5db789060795de47/bin/helpers/browser.sh
+# environment
+PYTHON_VERSION = 3.10.4
+# makefile
+.DEFAULT_GOAL := 
+# environment
+USER = vscode
+# default
+MAKE_VERSION := 4.3
+# environment
+VSCODE_EXTHOST_WILL_SEND_SOCKET = true
+# environment
+VSCODE_AGENT_FOLDER = /home/vscode/.vscode-server
+# environment
+_ = /bin/cat
+# environment
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-f6d0cbe7-f56e-4930-a591-b3b240231b2c.sock
+# environment
+NVM_CD_FLAGS = 
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /home/vscode
+# environment
+PYTHON_GET_PIP_SHA256 = e235c437e5c7d7524fbce3880ca39b917a73dc565e0c813465b7a7a329bb279a
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# variable set hash-table stats:
+# Load=77/1024=8%, Rehash=0, Collisions=2/104=2%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 64, inode 844424930570459): 28 files, no impossibilities.
+
+# 28 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+all:
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+GNUmakefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# files hash-table stats:
+# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 36 / storage = 423 B / avg = 11 B
+# current buf: size = 8162 B / used = 423 B / count = 36 / avg = 11 B
+
+# strcache performance: lookups = 39 / hit rate = 7%
+# hash-table stats:
+# Load=36/8192=0%, Rehash=0, Collisions=0/39=0%
+# Finished Make data base on Sat May 21 15:47:42 2022
+
+ 
