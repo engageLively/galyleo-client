@@ -22,7 +22,7 @@ copyright = '2021, engageLively'
 author = 'Andreas Bergen, Mahdi Biazi, Tim Braman, Matthew Hemmings, Rick McGeer, Robin Schreiber'
 
 # The full version, including alpha/beta/rc tags
-release = '05-23-2021'
+release = '05-23-2022'
 
 
 # -- General configuration ---------------------------------------------------
