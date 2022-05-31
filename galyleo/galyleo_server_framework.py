@@ -124,7 +124,7 @@ def _get_table_server(request_api):
         request_api: api  of the request
     '''
     table_name = request.headers.get('Table-Name')
-    dashboard_name = request.headers.get('Dashboard_Name')
+    dashboard_name = request.headers.get('Dashboard-Name')
     try:
         table_signature = _get_table_key(table_name, dashboard_name)
         try:
@@ -145,7 +145,7 @@ def _get_table_servers(request_api):
     '''
     
     table_name = request.headers.get('Table-Name')
-    dashboard_name = request.headers.get('Dashboard_Name')
+    dashboard_name = request.headers.get('Dashboard-Name')
     if table_name is not None:
         table_signature = _get_table_key(table_name, dashboard_name)
         try:
