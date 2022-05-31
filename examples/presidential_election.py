@@ -76,7 +76,7 @@ app = Flask(__name__)
 CORS(app)
 app.register_blueprint(galyleo_server_blueprint)
 
-@galyleo_server_blueprint.route('/', methods=['POST', 'GET']) 
+@galyleo_server_blueprint.route('/help', methods=['POST', 'GET']) 
 @galyleo_server_blueprint.route('/', methods=['POST', 'GET']) 
 def show_routes():
   '''
