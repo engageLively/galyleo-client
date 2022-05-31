@@ -338,3 +338,24 @@ def get_tables():
     for key in table_servers.keys():
         result[key] = table_servers[key].schema
     return jsonify(result)
+
+@galyleo_server_blueprint.route('/help', methods=['POST', 'GET']) 
+@galyleo_server_blueprint.route('/', methods=['POST', 'GET']) 
+def show_routes():
+  '''
+  Explain the API.  
+  Arguments:
+    None
+  '''
+  pages = [
+        {"url": "/, /help", "headers": "", "method": "GET", "description": "print this message"},
+        {"url": "/get_tables", "method": "GET", "headers": "", "description": 'Dumps a JSONIfied dictionary of the form:{table_name: <table_schema>}, where <table_schema> is a dictionary{"name": name, "type": type}'},
+        {"url": "/get_filtered_rows", "method": "GET", "headers": "Filter-Spec <i>Type Filter Spec, required</i>, Table-Name <i>string, required</i>, Dashboard-Name <i>string, optional</i>", "description": "Get the rows from table Table-Name (and, optionally, Dashboard-Name) which match filter Filter-Spec"},
+        {"url": "/get_numeric_spec?column_name<i>string, required</i>", "method": "GET", "headers": "Table-Name <i>string, optional</i>, Dashboard-Name <i>string, optional</i>", "description": "Get the  minimum, maximum, and increment values for column <i>column_name</i>, returned as a dictionary {min_val, max_val, increment}.  If Table-Name and/or Dashboard-Name is specified, restrict to that Table/Dashboard"},
+         {"url": "/get_all_values?column_name<i>string, required</i>", "method": "GET", "headers": "Table-Name <i>string, optional</i>, Dashboard-Name <i>string, optional</i>", "description": "Get all the distinct values for column <i>column_name</i>, returned as a sorted list.  If Table-Name and/or Dashboard-Name is specified, restrict to that Table/Dashboard"},
+        {"url": "/start", "method": "GET", "description": "ensure that all feeds are being updated"},
+
+    ]
+  page_strings = [f'<li>{page}</li>' for page in pages]
+
+  return f'<ul>{"".join(page_strings)}</ul>'
