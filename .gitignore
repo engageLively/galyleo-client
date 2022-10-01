@@ -11,3 +11,7 @@ galyleo.egg-info/top_level.txt
 examples/__pycache__/presidential_election.cpython-310.pyc
 examples/__pycache__/presidential_election.cpython-310.pyc
 examples/__pycache__/presidential_election.cpython-310.pyc
+dist/galyleo-2022.5.31-py3-none-any.whl
+.vscode/targets.log
+dist/galyleo-2022.5.31.tar.gz
+.vscode/targets.log

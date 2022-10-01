@@ -8,16 +8,16 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat May 28 05:51:34 2022
+# Make data base, printed on Sun Jun 19 16:38:16 2022
 
 # Variables
 
 # environment
-REMOTE_CONTAINERS_SOCKETS = ["/tmp/vscode-ssh-auth-d0bcebf6f529e266187cfbf6aa322534a285345d.sock"]
+REMOTE_CONTAINERS_SOCKETS = ["/tmp/vscode-ssh-auth-509c719970ab2a1b4e7e6d44ccbadc9fa95502df.sock"]
 # environment
 LC_ALL = C
 # environment
-VSCODE_CWD = /vscode/vscode-server/bin/linux-x64/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CWD = /vscode/vscode-server/bin/linux-x64/30d9c6cd9483b2cc586687151bcbcd635f373630
 # environment
 NVM_DIR = /usr/local/share/nvm
 # environment
@@ -69,7 +69,7 @@ APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 # environment
 MFLAGS = -pqrR
 # environment
-SSH_AUTH_SOCK = /tmp/vscode-ssh-auth-d0bcebf6f529e266187cfbf6aa322534a285345d.sock
+SSH_AUTH_SOCK = /tmp/vscode-ssh-auth-509c719970ab2a1b4e7e6d44ccbadc9fa95502df.sock
 # default
 .SHELLFLAGS := -c
 # environment
@@ -109,7 +109,7 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = /vscode/vscode-server/bin/linux-x64/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/remote-cli:/home/vscode/.local/bin:/usr/local/share/nvm/current/bin:/usr/local/bin:/usr/local/share/nvm/versions/node/v16.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/py-utils/bin:/home/vscode/.local/bin:/usr/local/py-utils/bin
+PATH = /vscode/vscode-server/bin/linux-x64/30d9c6cd9483b2cc586687151bcbcd635f373630/bin/remote-cli:/home/vscode/.local/bin:/usr/local/share/nvm/current/bin:/usr/local/bin:/usr/local/share/nvm/versions/node/v16.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/py-utils/bin:/home/vscode/.local/bin:/usr/local/py-utils/bin
 # default
 MAKEFILES := 
 # automatic
@@ -117,7 +117,7 @@ MAKEFILES :=
 # environment
 VSCODE_LOG_NATIVE = false
 # environment
-REMOTE_CONTAINERS_IPC = /tmp/vscode-remote-containers-ipc-d0bcebf6f529e266187cfbf6aa322534a285345d.sock
+REMOTE_CONTAINERS_IPC = /tmp/vscode-remote-containers-ipc-509c719970ab2a1b4e7e6d44ccbadc9fa95502df.sock
 # environment
 REMOTE_CONTAINERS = true
 # automatic
@@ -133,7 +133,7 @@ PYTHON_SETUPTOOLS_VERSION = 58.1.0
 # 'override' directive
 GNUMAKEFLAGS := 
 # environment
-BROWSER = /vscode/vscode-server/bin/linux-x64/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5/bin/helpers/browser.sh
+BROWSER = /vscode/vscode-server/bin/linux-x64/30d9c6cd9483b2cc586687151bcbcd635f373630/bin/helpers/browser.sh
 # environment
 PYTHON_VERSION = 3.10.4
 # makefile
@@ -149,7 +149,7 @@ VSCODE_AGENT_FOLDER = /home/vscode/.vscode-server
 # environment
 _ = /bin/cat
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-ceeaa644-3c5c-473a-bbb4-1946c087d330.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-b35ec7ae-1f37-4950-b195-8f4d7a00f859.sock
 # environment
 NVM_CD_FLAGS = 
 # environment
@@ -233,6 +233,6 @@ GNUmakefile:
 # strcache performance: lookups = 39 / hit rate = 7%
 # hash-table stats:
 # Load=36/8192=0%, Rehash=0, Collisions=0/39=0%
-# Finished Make data base on Sat May 28 05:51:34 2022
+# Finished Make data base on Sun Jun 19 16:38:16 2022
 
  
