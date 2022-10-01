@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Galyleo Python Client &mdash; Galyleo 05-23-2021 documentation</title>
+  <title>The Galyleo Python Client &mdash; Galyleo 05-23-2022 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -442,7 +442,8 @@ or a bad schema is specified, or a table row is the wrong length, or..</p>
 <span id="galyleo-constants"></span><h2>Galyleo Constants<a class="headerlink" href="#module-galyleo.galyleo_constants" title="Permalink to this headline"></a></h2>
 <dl class="simple">
 <dt>Constants that are used throughout the module.  These include:</dt><dd><ol class="arabic simple">
-<li><p>Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY)</p></li>
+<li><p>Data types for a table (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE,
+GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY)</p></li>
 <li><p>GALYLEO_TYPES: The types in a list</p></li>
 <li><p>MAXIMUM_DATA_SIZE: Maximum size, in bytes, of a GalyleoTable</p></li>
 <li><p>MAX_TABLE_ROWS: Maximum number of rows in a GalyleoTable</p></li>
@@ -452,7 +453,7 @@ or a bad schema is specified, or a table row is the wrong length, or..</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="galyleo.galyleo_constants.GALYLEO_SCHEMA_TYPES">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_constants.</span></span><span class="sig-name descname"><span class="pre">GALYLEO_SCHEMA_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['string',</span> <span class="pre">'number',</span> <span class="pre">'boolean',</span> <span class="pre">'date',</span> <span class="pre">'datetime',</span> <span class="pre">'timeofday']</span></em><a class="headerlink" href="#galyleo.galyleo_constants.GALYLEO_SCHEMA_TYPES" title="Permalink to this definition"></a></dt>
-<dd><p>Maximum size of a table being sent to the dashoard.  Exceeding this will throw a DataSizeExceeded exception</p>
+<dd><p>Maximum size of a table sent to the dashboard.  Exceeding this will throw a DataSizeExceeded exception</p>
 </dd></dl>
 
 <dl class="py data">
@@ -470,15 +471,21 @@ or a bad schema is specified, or a table row is the wrong length, or..</p>
 </section>
 <section id="module-galyleo.galyleo_table_server">
 <span id="galyleo-table-server"></span><h2>Galyleo Table Server<a class="headerlink" href="#module-galyleo.galyleo_table_server" title="Permalink to this headline"></a></h2>
+<p>A GalyleoDataServer class and associated utilities.  The GalyleoDataServer class is initialized
+with the table’s schema,  single function,get_rows(), which returns the rows of the table.  To
+use a  GalyleoDataServer instance, instantiate it with the schema and a get_rows() function.
+The GalyleoDataServer instance can then be passed to a GalyleoServer with a call to
+galyleo_server_framework.add_table_server, and the server will then be able to serve
+the tables automatically using the instantiated GalyleoDataServer.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.Filter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.Filter" title="Permalink to this definition"></a></dt>
 <dd><p>A Class which implements a Filter used by VirtualGalyleoTable to filter rows.
-The arguments to the contstructor are a filterSpec, which is a boolean tree 
-of filters and the columns which the filter is implemented over. 
+The arguments to the contstructor are a filterSpec, which is a boolean tree
+of filters and the columns which the filter is implemented over.
 Note that there is no error-checking here: it is assumed that the dashboard
 widgets will only select columns which appear in the tables, of the right type,
-and so on. 
+and so on.
 This is designed to be instantiated from VirtualGalyleoTable.get_filtered_rows()
 and in no other place – error checking, if any, should be done there.</p>
 <dl class="simple">
@@ -504,9 +511,19 @@ Returns the rows for which the filter returns True.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">GalyleoDataServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_rows</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer" title="Permalink to this definition"></a></dt>
-<dd><p>A Galyleo Data Server: This is instantiated with a function get_rows() which  delivers the rows, rather 
-than having them explicitly in the Table.  Note that get_rows() <em>must</em> return the approrpiate number of columns
-of the appropriate types</p>
+<dd><p>A Galyleo Data Server: This is instantiated with a function get_rows() which  delivers the
+rows, rather than having them explicitly in the Table.  Note that get_rows() <em>must</em> return
+the appropriate number of columns of the appropriate types.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><dl class="simple">
+<dt>schema: a list of records of the form {“name”: &lt;column_name, “type”: &lt;column_type&gt;}.</dt><dd><p>The column_type must be a type from galyleo_constants.GALYLEO_TYPES.</p>
+</dd>
+<dt>get_rows: a function which returns a list of list of values.  Each component list</dt><dd><p>must have the same length as schema, and the jth element must be of the
+type specified in the jth element of schema</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.all_values">
 <span class="sig-name descname"><span class="pre">all_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.all_values" title="Permalink to this definition"></a></dt>
@@ -571,12 +588,21 @@ if the filter spec is invalid</p>
 </section>
 <section id="module-galyleo.galyleo_server_framework">
 <span id="galyleo-server-framework"></span><h2>Galyleo Server Framework<a class="headerlink" href="#module-galyleo.galyleo_server_framework" title="Permalink to this headline"></a></h2>
+<p>A framework to easily and quickly implement a web server which serves tables according to
+the Galyleo URL protocol.  This implements the URL methods get_filtered_rows, get_all_values,
+and get_numeric_spec.  It parses the arguments, checking for errors, takes the
+table argument, looks up the appropriate GalyleoDataServer to serve for that table, and
+then calls the method on that server to serve the request.  If no exception is thrown,
+returns a 200 with the result as a JSON structure, and if an exception is thrown, returns
+a 400 with an approrpriate error message.
+All of the methods here except for add_table_server are simply route targets: none are
+designed for calls from any method other than flask</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="galyleo.galyleo_server_framework.add_table_server">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">add_table_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galyleo_data_server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashboard_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.add_table_server" title="Permalink to this definition"></a></dt>
-<dd><p>Register a GalyleoDataServer to serve data for a specific table name, and, optionally, dashboard_name
-if it is supplied.   Raises an InvalidDataException if table_name is None or galyleo_data_server is None
-or is not an instance of GalyleoDataServer</p>
+<dd><p>Register a GalyleoDataServer to serve data for a specific table name, and, optionally,
+dashboard_name if it is supplied.   Raises an InvalidDataException if table_name is
+None or galyleo_data_server is None or is not an instance of GalyleoDataServer.</p>
 <dl class="simple">
 <dt>Arguments:</dt><dd><p>table_name: name to register the server for
 galyleo_data_server: an instange of GalyleoDataServer which services the requests
@@ -598,10 +624,10 @@ dashboard_name: name of the dashboard (optional, None if not supplied)</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_all_values">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_all_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_all_values" title="Permalink to this definition"></a></dt>
-<dd><p>Target for the /get_all_values route.  Makes sure that column_name is specified
-in the call, and that if table_name is present, it is registered, then returns the distinct values a
-as a JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts
-with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
+<dd><p>Target for the /get_all_values route.  Makes sure that column_name is specified in the call,
+and that if table_name is present, it is registered, then returns the distinct values as a
+JSONified list.  Uses server.get_all_values(column_name) to get the values.  Aborts with a
+400 for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
 <dl class="simple">
 <dt>Arguments:</dt><dd><p>None</p>
 </dd>
@@ -629,9 +655,10 @@ InvalidDataException, or if the filter_spec is not valid JSON.</p>
 <dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_numeric_spec">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_numeric_spec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_numeric_spec" title="Permalink to this definition"></a></dt>
 <dd><p>Target for the /get_numeric_spec route.  Makes sure that column_name is specified
-in the call, and that if table_name is present, it is registered, then returns the numeric spec {“min_val”, “max_val”, “increment”}
-as a JSONified dictionary.  Uses server.get_numeric_spec(column_name) to create the numeric spec.  Aborts
-with a 400 for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
+in the call, and that if table_name is present, it is registered, then returns the
+numeric spec {“min_val”, “max_val”, “increment”} as a JSONified dictionary.  Uses
+server.get_numeric_spec(column_name) to create the numeric spec.  Aborts with a 400
+for missing arguments, bad table name, or if there is no column_name in the arguments.</p>
 <dl class="simple">
 <dt>Arrguments:</dt><dd><p>None</p>
 </dd>
@@ -658,6 +685,13 @@ with a 400 for missing arguments, bad table name, or if there is no column_name 
 <dt>Arguments:</dt><dd><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.show_routes">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">show_routes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.show_routes" title="Permalink to this definition"></a></dt>
+<dd><p>Show the API for the table server
+Arguments: None</p>
 </dd></dl>
 
 </section>

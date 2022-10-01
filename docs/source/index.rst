@@ -9,7 +9,7 @@ Welcome to Galyleo's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
    galyleo-client.rst
 
 

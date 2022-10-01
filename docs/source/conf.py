@@ -65,4 +65,4 @@ html_theme_options = {
     'style_nav_header_background': '#f87c04'
 }
 
-master_doc = 'source/index'
+master_doc = 'index'
