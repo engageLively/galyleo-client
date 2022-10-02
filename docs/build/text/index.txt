@@ -1,0 +1,34 @@
+Welcome to Galyleo’s documentation!
+***********************************
+
+
+Contents:
+^^^^^^^^^
+
+* The Galyleo Python Client
+
+  * Installation
+
+  * License
+
+  * Galyleo Table
+
+  * JupyterLab Client
+
+  * Galyleo Exceptions
+
+  * Galyleo Constants
+
+  * Galyleo Table Server
+
+  * Galyleo Server Framework
+
+
+Indices and tables
+******************
+
+* Index
+
+* Module Index
+
+* Search Page
