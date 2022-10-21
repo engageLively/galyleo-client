@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Galyleo'
-copyright = '2021, engageLively'
+copyright = '2021-2022, engageLively'
 author = 'Andreas Bergen, Mahdi Biazi, Tim Braman, Matthew Hemmings, Rick McGeer, Robin Schreiber'
 
 # The full version, including alpha/beta/rc tags

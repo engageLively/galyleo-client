@@ -591,6 +591,7 @@ class RemoteGalyleoTable:
         self.schema = schema
         self.base_url = base_url
         self.header_variables = header_variables if header_variables else []
+        self.data = [] # for compatibility with GalyleoTable -- so that client checks for data will be OK
 
     def as_dictionary(self):
         """     
