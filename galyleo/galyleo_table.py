@@ -614,12 +614,14 @@ class RemoteGalyleoTable:
             {"name": <table_name>, "table": {"columns": <list of schema records], "base_url": base_url, "header_variables": list of header variables}}
 
         """
+        connector = {"url": self.base_url}
+        if len(self.header_variables) > 0:
+            connector['header_variables'] = self.header_variables
         return {
             "name": self.name,
             "table": {
-                "base_url": self.base_url,
                 "columns": self.schema,
-                "header_variables": self.header_variables
+                "connector": connector
             }
         }
         
