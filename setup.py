@@ -8,10 +8,10 @@ setuptools.setup(
     version="2022.10.20",
     author="engageLively, inc",
     author_email="rick.mcgeer@engagelively.com",
-    description="A client to exchange Galyleo tables and data with a JupyterLab front end",
+    description="A client to create and exchange  Galyleo tables and data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="",
+    url="https://github.com/engageLively/galyleo-client",
     packages=['galyleo',],  # This is what you import: from galyleo import galyleo_table
     install_requires=[
       'pandas',
