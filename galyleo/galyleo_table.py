@@ -616,9 +616,9 @@ class RemoteGalyleoTable:
         """
         return {
             "name": self.name,
-            "columns": self.schema,
             "table": {
                 "base_url": self.base_url,
+                "columns": self.schema,
                 "header_variables": self.header_variables
             }
         }
