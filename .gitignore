@@ -15,3 +15,4 @@ dist/galyleo-2022.5.31-py3-none-any.whl
 .vscode/targets.log
 dist/galyleo-2022.5.31.tar.gz
 .vscode/targets.log
+test1.py

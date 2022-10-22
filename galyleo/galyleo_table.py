@@ -575,7 +575,7 @@ class RemoteGalyleoTable:
     dashboard where to get the data.  Note that this is much simpler than an explicit
     GalyleoTable, since the data manipulation is all done by the remote server.
     '''
-    def __init__(self, name:str, schema, base_url:str, header_variables = []):
+    def __init__(self, name:str, schema, base_url:str, interval:int = -1, header_variables = []):
         '''
         Initialize with the name, the schema (same as for an explicit table, above),
         the base_url, and the header_variables which are used for authemtication
@@ -584,12 +584,15 @@ class RemoteGalyleoTable:
             schema: list of the form {"name", "type"} for each column, same as in the parent
             base_url: the base URL to fetch the data from, a string.  The dashboard will add arguments for the methods
                       The server must implement the Galyleo Data Protocol
+            interval: a positive integer, indicating how often (in seconds) to query the table.  If omitted or <= 0, the table is only queried when 
+                    a refresh is requested through a UI action
             header_variables: a list of strings: header variables which are to be transmitted to the data server for authentication
 
         '''
         self.name = name
         self.schema = schema
         self.base_url = base_url
+        self.interval = interval
         self.header_variables = header_variables if header_variables else []
         self.data = [] # for compatibility with GalyleoTable -- so that client checks for data will be OK
 
@@ -617,6 +620,8 @@ class RemoteGalyleoTable:
         connector = {"url": self.base_url}
         if len(self.header_variables) > 0:
             connector['header_variables'] = self.header_variables
+        if self.interval > 0:
+            connector["interval"] = self.interval
         return {
             "name": self.name,
             "table": {
