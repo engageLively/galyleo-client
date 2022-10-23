@@ -1,3 +1,7 @@
+'''
+Test Module for the GalyleoServerFramework
+'''
+
 # BSD 3-Clause License
 
 # Copyright (c) 2019-2022, engageLively
@@ -56,26 +60,27 @@ def presidential_vote_column_values(column_name):
     result.sort()
     return result
 
+presidential_names = ['Year', 'State', 'Name', 'Party', 'Votes', 'Percentage']
 '''
 The names of the columns of the presidential table
 '''
-presidential_names = ['Year', 'State', 'Name', 'Party', 'Votes', 'Percentage']
+presidential_types = [GALYLEO_NUMBER, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER]
 '''
 The types of the columns of the presidential table
 '''
-presidential_types = [GALYLEO_NUMBER, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_NUMBER]
+schema = [{"name": presidential_names[i], "type": presidential_types[i]} for i in range(len(presidential_names))]
 '''
 The schema of the presidential table
 '''
-schema = [{"name": presidential_names[i], "type": presidential_types[i]} for i in range(len(presidential_names))]
+server = GalyleoDataServer(schema, presidential_vote_rows)
 '''
 Build the server for the presidential table
 '''
-server = GalyleoDataServer(schema, presidential_vote_rows)
+TABLE_NAME = 'presidential_table'
 '''
 table name, for convenience
 '''
-TABLE_NAME = 'presidential_table'
+
 def make_get_prefix(route):
     '''
     A convenience function to make the prefix for a GET call
@@ -96,19 +101,18 @@ def test_server_framework():
     assert galyleo_response.status == '200 OK'
     # headers= Headers({"table_name": TABLE_NAME})
     headers = {"Table-Name": TABLE_NAME}
-    
     # galyleo_response = client.get(f'{make_get_prefix("get_all_values")}&column_name=Year', )
     galyleo_response = client.get('/get_all_values?column_name=Year', headers = headers)
     assert galyleo_response.status == '200 OK'
     result = loads(galyleo_response.get_data(as_text = True))
     expected = [year for year in range(1828, 2021, 4)]
-    assert(result == expected)
+    assert result == expected
     # galyleo_response = client.get(f'{make_get_prefix("get_numeric_spec")}&column_name=Year')
     galyleo_response = client.get('/get_numeric_spec?column_name=Year', headers = headers)
     assert galyleo_response.status == '200 OK'
     expected = {"max_val": 2020, "min_val": 1828, "increment": 4}
     result = loads(galyleo_response.get_data(as_text = True))
-    assert(result == expected)
+    assert result == expected
     spec = {'operator': 'IN_RANGE', 'max_val': 1980, 'min_val': 1960, 'column': 'Year'}
     # data=dumps({'table_name': TABLE_NAME, 'filter_spec': spec})
     # data=dumps({'filter_spec': spec})
@@ -117,11 +121,12 @@ def test_server_framework():
     galyleo_response = client.get('/get_filtered_rows', headers = headers)
     assert galyleo_response.status == '200 OK'
     expected = [row for row in presidential_vote_rows() if row[0] >= 1960 and row[0] <= 1980]
-    response = galyleo_response.get_data(as_text = True)
-    result = loads(response)
+    actual_response = galyleo_response.get_data(as_text = True)
+    result = loads(actual_response)
     assert len(expected) == len(result)
-    
-    
-    
-    
-    
+    galyleo_response = client.get('/get_table_spec', headers=headers)
+    assert galyleo_response.status == '200 OK'
+    expected = {"schema": schema, "header_variables": {"required": [], "optional": []}}
+    actual_response = galyleo_response.get_data(as_text = True)
+    result = loads(actual_response)
+    assert expected == result

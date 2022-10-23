@@ -37,6 +37,10 @@
 		"ms-python.vscode-pylance"
 	],
 
+	"containerEnv": {
+		"PYTHONPATH": "$(PYTHONPATH):/workspaces/el-galyleo-client"
+	},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 

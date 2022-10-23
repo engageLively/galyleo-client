@@ -35,10 +35,9 @@ from functools import reduce
 from galyleo.galyleo_constants import GALYLEO_NUMBER
 from galyleo.galyleo_exceptions import InvalidDataException
 
-
 def check_valid_spec(filter_spec):
     '''
-    Class method which checks to make sure that a filter spec is valid.  
+    Class method which checks to make sure that a filter spec is valid.
     Does not return, but throws an InvalidDataException with an error message
     if the filter spec is invalid
 
@@ -61,7 +60,7 @@ def check_valid_spec(filter_spec):
         raise InvalidDataException(f'There is no operator in {filter_spec}')
     # Check to make sure that the fields are right for the operator that was given
     # We don't throw an error for extra fields, just for missing fields. Since we're
-    # going to use keys() to get the fields in the spec, and this will include the 
+    # going to use keys() to get the fields in the spec, and this will include the
     # operator, 'operator' is one of the fields
     fields = {
         'AND': {'arguments', 'operator'},
@@ -96,7 +95,8 @@ def check_valid_spec(filter_spec):
     if operator == 'IN_LIST':
         values_type = type(filter_spec['values'])
         if values_type == list:
-            invalid = [value for value in filter_spec['values'] if not type(value) in {str, float, int}]
+            value_list = filter_spec['values']
+            invalid = [value for value in value_list if not type(value) in {str, float, int}]
             if len(invalid) > 0:
                 raise InvalidDataException(f'Invalid Values {invalid} for IN_LIST')
         else:
@@ -145,7 +145,7 @@ class Filter:
                 raise InvalidDataException(f'{filter_spec["column"]} is not a valid column')
             self.max_val = filter_spec['max_val']
             self.min_val = filter_spec['min_val']
- 
+
     def filter(self, rows):
         '''
         Filter the rows according to the specification given to the constructor.
@@ -156,12 +156,12 @@ class Filter:
         Returns:
             subset of the rows, which pass the filter
         '''
-        # Just an overlay on _filter_index, which returns the INDICES of the rows
-        # which pass the filter.  This is the top-level call, _filter_index is recursive
-        indices = self._filter_index(rows)
+        # Just an overlay on filter_index, which returns the INDICES of the rows
+        # which pass the filter.  This is the top-level call, filter_index is recursive
+        indices = self.filter_index(rows)
         return [rows[i] for i in range(len(rows)) if i in indices]
 
-    def _filter_index(self, rows):
+    def filter_index(self, rows):
         '''
         Not designed for external call.
         Filter the rows according to the specification given to the constructor.
@@ -173,13 +173,13 @@ class Filter:
         '''
         all_indices = range(len(rows))
         if self.operator == 'AND':
-            argument_indices = [argument._filter_index(rows) for argument in self.arguments]
+            argument_indices = [argument.filter_index(rows) for argument in self.arguments]
             return reduce(lambda x, y: x & y, argument_indices, set(all_indices))
         elif self.operator == 'OR':
-            argument_indices = [argument._filter_index(rows) for argument in self.arguments]
+            argument_indices = [argument.filter_index(rows) for argument in self.arguments]
             return reduce(lambda x, y: x | y, argument_indices, set())
         elif self.operator == 'NOT':
-            return set(all_indices) - self.argument._filter_index(rows)
+            return set(all_indices) - self.argument.filter_index(rows)
         elif self.operator == 'IN_LIST':
             values = [row[self.column] for row in rows]
             return set([i for i in all_indices if values[i] in self.value_list])
@@ -188,6 +188,10 @@ class Filter:
             return set([i for i in all_indices if values[i] <= self.max_val and values[i] >= self.min_val])
 
 
+DEFAULT_HEADER_VARIABLES = {"required": [], "optional": []}
+'''
+The Default for header variables for a table is both required and optional lists are empty.
+'''
 class GalyleoDataServer:
     '''
     A Galyleo Data Server: This is instantiated with a function get_rows() which  delivers the
@@ -200,10 +204,15 @@ class GalyleoDataServer:
         get_rows: a function which returns a list of list of values.  Each component list
             must have the same length as schema, and the jth element must be of the
             type specified in the jth element of schema
+        header_variables: a dictionary of two fields, required and optional,
+            both of which are lists of strings (variable names).  Either
+            or both can be empty.  The variables (and their values) are
+            passed with each table request
     '''
-    def __init__(self, schema, get_rows):
+    def __init__(self, schema, get_rows, header_variables=None):
         self.schema = schema
         self.get_rows = get_rows
+        self.header_variables = DEFAULT_HEADER_VARIABLES if header_variables is None else header_variables
 
     # This is used to get the names of a column from the schema
 
@@ -212,7 +221,8 @@ class GalyleoDataServer:
 
     def get_column_type(self, column_name):
         '''
-        Returns the type of column column_name, or None if this table doesn't have a column with that name.
+        Returns the type of column column_name, or None if this table doesn't have a column with
+        name  column_name.
 
         Arguments:
             column_name: name of the column to get the type for
@@ -245,8 +255,7 @@ class GalyleoDataServer:
     def numeric_spec(self, column_name:str):
         '''
         get the dictionary {min_val, max_val, increment} for column_name
-       
-        Arguments:
+       Arguments:
             column_name: name of the column to get the numeric spec for
         Returns:
             the minimum, maximum, and increment of the column
@@ -269,7 +278,7 @@ class GalyleoDataServer:
     def get_filtered_rows(self, filter_spec):
         '''
         Filter the rows according to the specification given by filter_spec.
-        Returns the rows for which the resulting filter returns True. 
+        Returns the rows for which the resulting filter returns True.
 
         Arguments:
             filter_spec: Specification of the filter, as a dictionary
