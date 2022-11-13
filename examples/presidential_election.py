@@ -32,7 +32,7 @@
 A simple example application showing how to use the GalyleoServerFramework to serve the tables in the presidential
 election dashboard.  To run this, make sure that FLASK_APP is set to presidential_election.py in the environment
 '''
-import sys
+# import sys
 
 
 from galyleo.galyleo_table_server import GalyleoDataServer

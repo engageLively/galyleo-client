@@ -45,22 +45,22 @@ def test_check_filter():
     with pytest.raises(InvalidDataException, match=f'There is no operator in {no_operator_spec}'):
         check_valid_spec(no_operator_spec)
     no_operator_spec = {'operator': 'bar'}    
-    valid_operators = {'AND', 'OR', 'NOT', 'IN_LIST', 'IN_RANGE'}
+    valid_operators = {'ALL', 'ANY', 'NONE', 'IN_LIST', 'IN_RANGE'}
     with pytest.raises(InvalidDataException, match=f'bar is not a valid operator.  Valid filter operators are {valid_operators}'):
         check_valid_spec(no_operator_spec)
     bad_fields = [
-        ({'operator': 'AND'}, {'arguments'}),
-        ({'operator': 'AND', 'foo': 'bar'}, {'arguments'}),
-        ({'operator': 'AND', 'values': [1,2]}, { 'arguments'}),
-        ({'operator': 'AND', 'argument': [1,2]}, {'arguments'}),
-        ({'operator': 'OR'}, {'arguments'}),
-        ({'operator': 'OR', 'foo': 'bar'}, {'arguments'}),
-        ({'operator': 'OR', 'values': [1,2]}, {'arguments'}), 
-        ({'operator': 'OR', 'argument': [1,2]}, {'arguments'}),
-        ({'operator': 'NOT'},  {'argument'}),
-        ({'operator': 'NOT', 'foo': 'bar'},  {'argument'}),
-        ({'operator': 'NOT', 'values': [1,2]},  {'argument'}),
-        ({'operator': 'NOT', 'arguments': [1,2]},  {'argument'}),
+        ({'operator': 'ALL'}, {'arguments'}),
+        ({'operator': 'ALL', 'foo': 'bar'}, {'arguments'}),
+        ({'operator': 'ALL', 'values': [1,2]}, { 'arguments'}),
+        ({'operator': 'ALL', 'argument': [1,2]}, {'arguments'}),
+        ({'operator': 'ANY'}, {'arguments'}),
+        ({'operator': 'ANY', 'foo': 'bar'}, {'arguments'}),
+        ({'operator': 'ANY', 'values': [1,2]}, {'arguments'}), 
+        ({'operator': 'ANY', 'argument': [1,2]}, {'arguments'}),
+        ({'operator': 'NONE'},  {'argument'}),
+        ({'operator': 'NONE', 'foo': 'bar'},  {'argument'}),
+        ({'operator': 'NONE', 'values': [1,2]},  {'argument'}),
+        ({'operator': 'NONE', 'arguments': [1,2]},  {'argument'}),
         ({'operator': 'IN_RANGE'}, {'column', 'max_val', 'min_val'}),
         ({'operator': 'IN_RANGE', 'max_val': 10, 'min_val': 5}, {'column'}),
         ({'operator': 'IN_RANGE', 'column': 'a'}, {'max_val, min_val'}), 
@@ -73,20 +73,20 @@ def test_check_filter():
     for spec in bad_fields:
          with pytest.raises(InvalidDataException, match='is missing required fields'):
              check_valid_spec(spec[0])
-    # Do a bad list test for AND/OR
-    with pytest.raises(InvalidDataException, match=f'The arguments field for AND must be a list, not {type({"a": "b"})}'):
-        check_valid_spec({"operator": 'AND', "arguments": {"a": "b"}})
+    # Do a bad list test for ALL/ANY
+    with pytest.raises(InvalidDataException, match=f'The arguments field for ALL must be a list, not {type({"a": "b"})}'):
+        check_valid_spec({"operator": 'ALL', "arguments": {"a": "b"}})
     
     
     good_spec = {"operator": "IN_RANGE", "min_val": 0, "max_val": 10, "column": "a"}
     bad_spec = {"operator": "IN_RANGE", "min_val": 0, "max_val": 10}
     # first, make sure this is OK with two good specs
-    check_valid_spec({"operator": "AND", "arguments": [good_spec, good_spec]})
+    check_valid_spec({"operator": "ALL", "arguments": [good_spec, good_spec]})
     with pytest.raises(InvalidDataException, match='is missing required fields'):
-        check_valid_spec({"operator": "AND", "arguments": [good_spec, bad_spec]})
-    check_valid_spec({"operator": "NOT", "argument": good_spec})
+        check_valid_spec({"operator": "ALL", "arguments": [good_spec, bad_spec]})
+    check_valid_spec({"operator": "NONE", "argument": good_spec})
     with pytest.raises(InvalidDataException, match='is missing required fields'):
-        check_valid_spec({"operator": "NOT", "argument": bad_spec})
+        check_valid_spec({"operator": "NONE", "argument": bad_spec})
     check_valid_spec(good_spec)
     bad_spec['column'] = 1
     # make sure ints are valid column names
@@ -123,20 +123,20 @@ def test_check_filter():
         with pytest.raises(InvalidDataException, match=message):
             check_valid_spec(bad_range)
     # Make sure recursion works well with good arguments:
-    spec1 = {"operator": 'AND', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
-    spec2 = {"operator": 'OR', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
-    spec3 = {"operator": 'NOT', 'argument':  good_list_spec}
-    spec4 = {"operator": 'AND', 'arguments': [spec1, good_list_spec]}
-    spec5 = {"operator": 'OR', 'arguments': [spec1, spec4]}
-    spec6 = {"operator": 'NOT', 'argument': spec5}
+    spec1 = {"operator": 'ALL', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
+    spec2 = {"operator": 'ANY', 'arguments': [good_ranges[0], good_ranges[1], good_list_spec]}
+    spec3 = {"operator": 'NONE', 'argument':  good_list_spec}
+    spec4 = {"operator": 'ALL', 'arguments': [spec1, good_list_spec]}
+    spec5 = {"operator": 'ANY', 'arguments': [spec1, spec4]}
+    spec6 = {"operator": 'NONE', 'argument': spec5}
     good_specs = [spec1, spec2, spec3, spec4, spec5, spec6]
     for spec in good_specs: check_valid_spec(spec)
-    bad_spec_1 = {'operator': 'NOT', 'argument': bad_ranges[0]}
-    bad_spec_2 = {'operator': 'AND', 'arguments': [bad_ranges[1], good_ranges[0]]}
-    bad_spec_3 = {'operator': 'OR', 'arguments': [bad_ranges[1], good_ranges[0]]}
-    bad_spec_4 = {'operator': 'AND', 'arguments': [spec1, bad_spec_1]}
-    bad_spec_5 = {'operator': 'OR', 'arguments': [spec2, bad_spec_4]}
-    bad_spec_6 = {'operator': 'NOT', 'argument': bad_spec_4}
+    bad_spec_1 = {'operator': 'NONE', 'argument': bad_ranges[0]}
+    bad_spec_2 = {'operator': 'ALL', 'arguments': [bad_ranges[1], good_ranges[0]]}
+    bad_spec_3 = {'operator': 'ANY', 'arguments': [bad_ranges[1], good_ranges[0]]}
+    bad_spec_4 = {'operator': 'ALL', 'arguments': [spec1, bad_spec_1]}
+    bad_spec_5 = {'operator': 'ANY', 'arguments': [spec2, bad_spec_4]}
+    bad_spec_6 = {'operator': 'NONE', 'argument': bad_spec_4}
     bad_specs = [bad_spec_1, bad_spec_2, bad_spec_3, bad_spec_4, bad_spec_5, bad_spec_6]
     for spec in bad_specs:
         with pytest.raises(InvalidDataException):
@@ -185,12 +185,12 @@ def test_and():
     filter1 = {"operator": "IN_RANGE", 'column': 'a', 'max_val': 20, 'min_val': 10}
     filter2 = {"operator": "IN_LIST", 'column': 'b', 'values': [1, 2, 3]}
     filter_spec = {
-        "operator": "AND",
+        "operator": "ALL",
         "arguments": [ filter1, filter2 ]
     }
     columns = ['a', 'b']
     filter = Filter(filter_spec, columns)
-    assert(filter.operator == 'AND')
+    assert(filter.operator == 'ALL')
     assert(len(filter.arguments) == 2)
     f1 = Filter(filter1, columns)
     assert(f1.operator == 'IN_RANGE' and f1.column == 0 and f1.max_val == 20 and f1.min_val == 10)
@@ -208,12 +208,12 @@ def test_or():
     filter1 = {"operator": "IN_RANGE", 'column': 'a', 'max_val': 20, 'min_val': 10}
     filter2 = {"operator": "IN_LIST", 'column': 'b', 'values': [1, 2, 3]}
     filter_spec = {
-        "operator": "OR",
+        "operator": "ANY",
         "arguments": [ filter1, filter2 ]
     }
     columns = ['a', 'b']
     filter = Filter(filter_spec, columns)
-    assert(filter.operator == 'OR')
+    assert(filter.operator == 'ANY')
     assert(len(filter.arguments) == 2)
     f1 = filter.arguments[0]
     assert(f1.operator == 'IN_RANGE' and f1.column == 0 and f1.max_val == 20 and f1.min_val == 10)
@@ -228,12 +228,12 @@ def test_or():
 def test_not():
     filter1 = {"operator": "IN_RANGE", 'column': 'a', 'max_val': 20, 'min_val': 10}
     filter_spec = {
-        "operator": "NOT",
+        "operator": "NONE",
         "argument": filter1
     }
     columns = ['a']
     filter = Filter(filter_spec, columns)
-    assert(filter.operator == 'NOT')
+    assert(filter.operator == 'NONE')
     f1 = filter.argument
     assert(f1.operator == 'IN_RANGE' and f1.column == 0 and f1.max_val == 20 and f1.min_val == 10)
     try:
@@ -290,7 +290,7 @@ def test_filter_not():
     inner_filter_spec = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
     inner_filter = Filter(inner_filter_spec, columns)
     filter_spec = {
-        "operator": "NOT",
+        "operator": "NONE",
         "argument": inner_filter_spec
     }
     filter = Filter(filter_spec, columns)
@@ -301,7 +301,7 @@ def test_filter_and():
     filter_spec1 = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
     filter_spec2 = {"operator": "IN_RANGE", 'column': 'b', 'min_val': 6, 'max_val': 7}
     filter_spec = {
-        "operator": "AND",
+        "operator": "ALL",
         "arguments": [filter_spec1, filter_spec2]
     }
     filter = Filter(filter_spec, columns)
@@ -315,7 +315,7 @@ def test_filter_or():
     filter_spec1 = {"operator": "IN_LIST", 'column': 'a', 'values': ['a', 'b']}
     filter_spec2 = {"operator": "IN_RANGE", 'column': 'b', 'min_val': 6, 'max_val': 7}
     filter_spec = {
-        "operator": "OR",
+        "operator": "ANY",
         "arguments": [filter_spec1, filter_spec2]
     }
     filter = Filter(filter_spec, columns)

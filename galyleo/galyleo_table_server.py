@@ -52,7 +52,7 @@ def check_valid_spec(filter_spec):
     # Step 1: check to make sure there is an operator field, and that it's an operator we recognize
     if 'operator' in filter_spec:
         operator = filter_spec['operator']
-        valid_operators = {'AND', 'OR', 'NOT', 'IN_LIST', 'IN_RANGE'}
+        valid_operators = {'ALL', 'ANY', 'NONE', 'IN_LIST', 'IN_RANGE'}
         if not operator in valid_operators:
             msg = f'{operator} is not a valid operator.  Valid operators are {valid_operators}'
             raise InvalidDataException(msg)
@@ -63,9 +63,9 @@ def check_valid_spec(filter_spec):
     # going to use keys() to get the fields in the spec, and this will include the
     # operator, 'operator' is one of the fields
     fields = {
-        'AND': {'arguments', 'operator'},
-        'OR': {'arguments', 'operator'},
-        'NOT': {'argument', 'operator'},
+        'ALL': {'arguments', 'operator'},
+        'ANY': {'arguments', 'operator'},
+        'NONE': {'argument', 'operator'},
         'IN_LIST': {'column', 'values', 'operator'},
         'IN_RANGE': {'column', 'max_val', 'min_val', 'operator'}
     }
@@ -73,8 +73,8 @@ def check_valid_spec(filter_spec):
     missing_fields = fields[operator] - fields_in_spec
     if len(missing_fields) > 0:
         raise InvalidDataException(f'{filter_spec} is missing required fields {missing_fields}')
-    # For AND and OR, recursively check the arguments list and return
-    if (operator in {'AND', 'OR'}):
+    # For ALL and ANY, recursively check the arguments list and return
+    if (operator in {'ALL', 'ANY'}):
         if not isinstance(filter_spec['arguments'], list):
             bad_type = type(filter_spec["arguments"])
             msg = f'The arguments field for {operator} must be a list, not {bad_type}'
@@ -82,8 +82,8 @@ def check_valid_spec(filter_spec):
         for arg in filter_spec['arguments']:
             check_valid_spec(arg)
         return
-    # For NOT, recursively check the argument field
-    elif operator == 'NOT':
+    # For NONE, recursively check the argument field
+    elif operator == 'NONE':
         check_valid_spec(filter_spec['argument'])
         return
     # if we get here, it's IN_LIST or IN_RANGE.  For both, check that the column is a string
@@ -128,9 +128,9 @@ class Filter:
     '''
     def __init__(self, filter_spec, columns):
         self.operator = filter_spec["operator"]
-        if (self.operator == 'AND' or self.operator == 'OR'):
+        if (self.operator == 'ALL' or self.operator == 'ANY'):
             self.arguments = [Filter(argument, columns) for argument in filter_spec["arguments"]]
-        elif self.operator == 'NOT':
+        elif self.operator == 'NONE':
             self.argument = Filter(filter_spec['argument'], columns)
         elif self.operator == 'IN_LIST':
             try:
@@ -172,13 +172,13 @@ class Filter:
                INDICES of the rows which pass the filter, AS A SET
         '''
         all_indices = range(len(rows))
-        if self.operator == 'AND':
+        if self.operator == 'ALL':
             argument_indices = [argument.filter_index(rows) for argument in self.arguments]
             return reduce(lambda x, y: x & y, argument_indices, set(all_indices))
-        elif self.operator == 'OR':
+        elif self.operator == 'ANY':
             argument_indices = [argument.filter_index(rows) for argument in self.arguments]
             return reduce(lambda x, y: x | y, argument_indices, set())
-        elif self.operator == 'NOT':
+        elif self.operator == 'NONE':
             return set(all_indices) - self.argument.filter_index(rows)
         elif self.operator == 'IN_LIST':
             values = [row[self.column] for row in rows]
