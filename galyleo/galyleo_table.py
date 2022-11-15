@@ -28,22 +28,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+'''
+The GalyleoTable and RemoteGalyleoTable classes
+'''
+
+from json import JSONDecodeError, dumps, loads
+
 import gviz_api
-import pandas as pd
-from galyleo.galyleo_constants import GALYLEO_SCHEMA_TYPES
 import numpy
-from galyleo.galyleo_constants import GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
-from json import loads, dumps, JSONDecodeError
+
+from galyleo.galyleo_constants import (GALYLEO_BOOLEAN, GALYLEO_NUMBER,
+                                       GALYLEO_STRING)
 from galyleo.galyleo_exceptions import InvalidDataException
+
+# import pandas as pd
+
+
 
 #
 # Initialize with  the table name
 #
 class GalyleoTable:
     '''
-    A Galyleo Dashboard Table.  Used to create a Galyleo Dashboard Table from any of a number of sources, and then generate an object that is suitable
-    for storage (as a JSON file).  A GalyleoTable is very similar to  a Google Visualization data table, and can be
-    converted to a Google Visualization Data Table on either the Python or the JavaScript side.
+    A Galyleo Dashboard Table.  Used to create a Galyleo Dashboard Table from any of a number of
+    sources, and then generate an object that is suitable for storage (as a JSON file).  A
+    GalyleoTable is very similar to  a Google Visualization data table , and can be converted
+    to a Google Visualization Data Table on either the Python or the JavaScript side.
     Convenience routines provided here to import data from pandas, and json format.
     '''
     def __init__(self, name:str):
@@ -58,7 +68,7 @@ class GalyleoTable:
         self.data = []
 
     def equal(self, table, names_must_match = False):
-        """ 
+        """
         Test to see if this table is equal to another table, passed as
         an argument.  Two tables are equal if their schemas are the same
         length and column names and types match, and if the data is the same,
@@ -68,20 +78,20 @@ class GalyleoTable:
         Args:
            table (GalyleoTable): table to be checked for equality
            names_must_match (bool): (default False) if True, table names must also match
-        
+
         Returns:
            True if equal, False otherwise
-        
+
         """
-        if (len(self.schema) != len(table.schema)):
+        if len(self.schema) != len(table.schema):
             return False
-        if (len(self.data) != len(table.data)):
+        if len(self.data) != len(table.data):
             return False
-        for i in range(len(self.schema)):
-            if (self.schema[i] != table.schema[i]):
+        for i, column in enumerate(self.schema):
+            if column != table.schema[i]:
                 return False
-        for i in range(len(self.data)):
-            if (self.data[i] != table.data[i]):
+        for i, element in enumerate(self.data):
+            if element != table.data[i]:
                 return False
         if names_must_match:
             return self.name == table.name
@@ -89,12 +99,12 @@ class GalyleoTable:
 
     #
     # Check that a schema expressed as a list of tuples (name, type)
-    # matches a list of rows given as data.  We let gviz_api do the 
+    # matches a list of rows given as data.  We let gviz_api do the
     # checking for us.
     # Schema is a list of pairs [(<column_name>, <column_type>)]
     # where column_type is one of GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
     # GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY.  All of these are defined
-    # in galyleoconstants.  data is a list of lists, where each list is a row of 
+    # in galyleoconstants.  data is a list of lists, where each list is a row of
     # the table.  Two conditions:
     # (1) Each type must be one of types listed above
     # (2) Each list in data must have the same length as the schema, and the type of each
@@ -104,25 +114,42 @@ class GalyleoTable:
     #     schema: the schema as a list of pairs
     #     data: the data as a list of lists
     #
-    def _check_schema_match(self, schema, data):
+    def check_schema_match(self, schema, data):
+        '''
+        Check that a schema expressed as a list of tuples (name, type)
+        matches a list of rows given as data.
+        Schema is a list of pairs [(<column_name>, <column_type>)]
+        where column_type is one of GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY.  All of these are defined
+        in galyleoconstants.  data is a list of lists, where each list is a row of
+        the table.  Two conditions:
+            (1) Each type must be one of types listed above
+            (2) Each list in data must have the same length as the schema, and the type of each
+            element must match the corresponding schema type
+        throws an InvalidDataException if either of these are violeated
+        parameters:
+            schema: the schema as a list of pairs
+            data: the data as a list of lists
+        '''
+
         for row in data:
-            if (len(row) != len(schema)):
+            if len(row) != len(schema):
                 raise InvalidDataException(f"All rows must have length {len(schema)}")
         try:
             table = gviz_api.DataTable(schema)
             table.LoadData(data)
             table.ToJSon()
         except gviz_api.DataTableException as schema_error:
-            raise InvalidDataException(schema_error)
+            raise InvalidDataException('Error found by schema checker') from schema_error
 
-    
+
     def load_from_schema_and_data(self, schema:list, data:list):
-        """     
+        """
         Load from a pair (schema, data).
         Schema is a list of pairs [(<column_name>, <column_type>)]
         where column_type is one of the Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
         GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
-        in galyleo_constants.  data is a list of lists, where each list is a row of 
+        in galyleo_constants.  data is a list of lists, where each list is a row of
         the table.  Two conditions:
 
         (1) Each type must be one of types listed above
@@ -137,13 +164,13 @@ class GalyleoTable:
             data (list of lists): the data as a list of lists
 
         """
-        self._check_schema_match(schema, data)
+        self.check_schema_match(schema, data)
         self.schema = [{"name": record[0], "type": record[1]} for record in schema]
         self.data = data # should I clone?
 
     #
     # An internal routine used to map a Pandas or Numpy type to a Galyleo
-    # type: mostly this involves mapping one of Numpy's many number types
+    # type.  Mostly this involves mapping one of Numpy's many number types
     # to GALYLEO_NUMBER.  Used by load_from_dataframe.  If a type is unrecognized
     # it maps to GALYLEO_STRING
     # parameters:
@@ -154,21 +181,23 @@ class GalyleoTable:
     def _match_type(self, dtype):
         type_map = {
             GALYLEO_BOOLEAN: [numpy.bool_],
-            GALYLEO_NUMBER:[ numpy.byte, numpy.ubyte, numpy.short, numpy.ushort, numpy.intc, numpy.uintc, numpy.int_, numpy.uint, numpy.longlong, numpy.ulonglong, numpy.float16, numpy.single, numpy.double, numpy.longdouble, numpy.csingle, numpy.cdouble, numpy.clongdouble]
+            GALYLEO_NUMBER:[ numpy.byte, numpy.ubyte, numpy.short, numpy.ushort, numpy.intc, numpy.uintc, numpy.int_,
+            numpy.uint, numpy.longlong, numpy.ulonglong, numpy.float16, numpy.single, numpy.double, numpy.longdouble,
+            numpy.csingle, numpy.cdouble, numpy.clongdouble]
         }
-        for galyleo_type in type_map.keys():
-            if dtype in type_map[galyleo_type]:
+        for galyleo_type, dtype_list in type_map.items():
+            if dtype in dtype_list:
                 return galyleo_type
         return GALYLEO_STRING
 
     def load_from_dataframe(self, dataframe, schema = None):
-        """    
+        """
         Load from a Pandas Dataframe.  The schema is given in the optional second parameter,
         as a list of records {"name": <name>, "type": <type>}, where type is a Galyleo type. (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
-        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY). 
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).
         If the second parameter is not present, the schema is derived from the name and
         column types of the dataframe, and each row of the dataframe becomes a row
-        of the table.  
+        of the table.
 
         Args:
 
@@ -185,18 +214,18 @@ class GalyleoTable:
             self.schema = [{"name": names[i], "type": galyleo_types[i]} for i in range(len(names))]
         rows = [r for r in dataframe.iterrows()]
         self.data = [r[1].tolist() for r in rows]
-    
-   
+
+
     def as_dictionary(self):
-        """     
+        """
         Return the form of the table as a dictionary.  This is a dictionary
         of the form:
-        {"name": <table_name>,"table": <table_struct>} 
+        {"name": <table_name>,"table": <table_struct>}
         where table_struct is of the form:
         {"columns": [<list of schema records],"rows": [<list of rows of the table>]}
 
         A schema record is a record of the form:
-        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        {"name": < column_name>, "type": <column_type}, where type is one of the
         Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
         GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
         in galyleo_constants.
@@ -210,65 +239,65 @@ class GalyleoTable:
         """
         return {"name": self.name, "table": {"columns": self.schema, "rows": self.data}}
 
-    
-    def load_from_dictionary(self, dict):
-        """     
+
+    def load_from_dictionary(self, table_as_dictionary):
+        """
         load data from a dictionary of the form: {"columns": [<list of schema records], "rows": [<list of rows of the table>]}
 
         A schema record is a record of the form:
-        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        {"name": < column_name>, "type": <column_type}, where type is one of the
         Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
-        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  
-        
+        GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).
+
         Throws InvalidDataException if the dictionary is of the wrong format
         or the rows don't match the columns.
 
         Args:
-            dict: the table as a dictionary (a value returned by as_dictionary)
+            table_as_dictionary: the table as a dictionary (a value returned by as_dictionary)
 
         Throws:
-           InvalidDataException if dict is malformed
+           InvalidDataException if table_as_dictionary is malformed
 
         """
-        self._check_fields(dict, {"columns", "rows"}, 'JSON  table descriptor')
-        columns = dict["columns"]
+        self._check_fields(table_as_dictionary, {"columns", "rows"}, 'JSON  table descriptor')
+        columns = table_as_dictionary["columns"]
         for column in columns:
             self._check_fields(column, {"name", "type"}, "Column description")
         schema = [(record["name"], record["type"]) for record in columns]
-        self._check_schema_match(schema, dict["rows"])
+        self.check_schema_match(schema, table_as_dictionary["rows"])
         self.schema = columns
-        self.data = dict["rows"]
+        self.data = table_as_dictionary["rows"]
 
 
-    
+
     def to_json(self):
-        """     
+        """
         Return the table as a JSON string, suitable for transmitting as a message
         or saving to a file.  This is just a JSON form of the dictionary form of
         the string.  (See as_dictionary)
 
         Returns:
            as_dictionary() as a JSON string
-        
+
         """
         return dumps(self.as_dictionary())
 
     #
     # A utility to check if a dictionary contains all required keys
-    # Raises an InvalidDataException if any are missing, with the 
+    # Raises an InvalidDataException if any are missing, with the
     # appropriate error message
     # parameters:
     #   record: the record (dictionary) to be checked
     #   required_fields: the fields that must be in the record
     #   message_header: the phrase that must be in the message
-    # 
+    #
     def _check_fields(self, record, required_fields, message_header):
         fields = set(record.keys())
-        if (not fields.issuperset(required_fields)):
+        if not fields.issuperset(required_fields):
             raise InvalidDataException(f'{message_header} is missing fields {required_fields - fields}')
-    
+
     def from_json(self, json_form, overwrite_name = True):
-        """     
+        """
         Load the table from a JSON string, of the form produced by toJSON().  Note
         that if the overwrite_name parameter = True (the default), this will also
         overwrite the table name.
@@ -287,15 +316,15 @@ class GalyleoTable:
         """
         try:
             record = loads(json_form)
-        except JSONDecodeError(msg):
-            raise InvalidDataException(msg)
-        if (type(record) != dict):
+        except JSONDecodeError as msg:
+            raise InvalidDataException('Error found in JSON Decode') from msg
+        if not isinstance(record, dict):
             raise InvalidDataException(f'JSON form of table must be a dictionary, not {type(record)}')
         self._check_fields(record, {"name", "table"}, 'JSON form of table')
         self.load_from_dictionary(record["table"])
-        if (overwrite_name):
+        if overwrite_name:
             self.name = record["name"]
-        
+
     def aggregate_by(self, aggregate_column_names, new_column_name = "count", new_table_name = None):
         """
         Create a new table by aggregating over multiple columns.  The resulting table
@@ -312,23 +341,22 @@ class GalyleoTable:
 
         Returns:
             A new table with name new_table_name, or a generated name if new_table_name == None
-        
+
         Throws:
             InvalidDataException if one of the column names is missing
-        
+
         """
-        if (aggregate_column_names == None or len(aggregate_column_names) == 0):
-             raise InvalidDataException('No columns specified for aggregation')
+        if aggregate_column_names is None or len(aggregate_column_names) == 0:
+            raise InvalidDataException('No columns specified for aggregation')
         column_names = set(aggregate_column_names)
         columns = [entry for entry in self.schema if entry["name"] in column_names]
-        if (len(aggregate_column_names) != len(columns)):
+        if len(aggregate_column_names) != len(columns):
             # We have a missing column.  Find it and throw the InvalidDataException
             current_columns = set([entry["name"] for entry in columns])
             missing_columns = column_names - current_columns
             raise InvalidDataException(f'Columns {missing_columns} are not present in the schema')
         # Make a table name
-        if (new_table_name == None):
-            letters = [name[0] for name in aggregate_column_names]
+        if new_table_name is  None:
             new_table_name = 'aggregate_' + ''.join([name[0] for name in aggregate_column_names])
         # Collect the indices of the requested columns
         indices = [i  for i in range(len(self.schema)) if self.schema[i]["name"] in column_names]
@@ -342,8 +370,10 @@ class GalyleoTable:
         keys = set(short_rows)
         # Now that we have the unique keys, count the number of instances of each
         count = {}
-        for key in keys: count[key] = 0
-        for key in short_rows: count[key] = count[key] + 1
+        for key in keys:
+            count[key] = 0
+        for key in short_rows:
+            count[key] = count[key] + 1
         # convert the keys from tuples to lists, add the count for each one, and
         # filter out the 0's
         data = []
@@ -352,7 +382,7 @@ class GalyleoTable:
             data.append(key_as_list + [count[key]])
         data = [row for row in data if row[-1] > 0]
         # The schema is just the requested columns + new_column_name, and the type
-        # of new_column_name is a number.  Then create the result table, load in the 
+        # of new_column_name is a number.  Then create the result table, load in the
         # schema and data, and quit.
         schema = columns[:] + [{"name": new_column_name, "type": GALYLEO_NUMBER}]
         table = GalyleoTable(new_table_name)
@@ -360,9 +390,9 @@ class GalyleoTable:
         return table
 
 
-    def filter_by_function(self, column_name, function, new_table_name, column_types = {}):
+    def filter_by_function(self, column_name, function, new_table_name, column_types = None):
         '''
-        Create a new table, with name table_name, with rows such that 
+        Create a new table, with name table_name, with rows such that
         function(row[column_name]) == True.  The new table will have
         columns {self.columns} - {column_name}, same types, and same order
         Throws an InvalidDataException if:
@@ -375,23 +405,25 @@ class GalyleoTable:
             function: a Boolean function with a single argument of the type of columns[column_name]
             new_table_name: name of the new table
             column_types: set of the allowed column types; if empty, any type is permitted
-        
+
         Returns:
             A table with column[column_name] missing and filtered
-        
+
         Throws:
             InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn't in column_types (if column_types is non-empty)
         '''
-        if (not new_table_name ):
+        if column_types is None:
+            column_types = {}
+        if not new_table_name:
             raise InvalidDataException('new_table_name cannot be empty')
-        if (not column_name):
+        if not column_name:
             raise InvalidDataException('column_name cannot be empty')
         indices = [i for i in range(len(self.schema)) if self.schema[i]["name"] == column_name]
-        if (len(indices) == 0):
+        if len(indices) == 0:
             raise InvalidDataException(f'Column {column_name} not found in schema')
         index = indices[0]
-        if (column_types):
-            if (not self.schema[index]["type"] in column_types):
+        if column_types:
+            if not self.schema[index]["type"] in column_types:
                 raise InvalidDataException(f'Type {self.schema[index]["type"]} not found in {column_types}')
         data = [row[:index] + row[index+1:] for row in self.data if function(row[index])]
         schema = self.schema[:index] + self.schema[index+1:]
@@ -409,10 +441,10 @@ class GalyleoTable:
             value: the value to march for equality
             new_table_name: name of the new table
             column_types: set of the allowed column types; if empty, any type is permitted
-        
+
         Returns:
             A table with column[column_name] missing and filtered
-        
+
          Throws:
             InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn't in column_types (if column_types is non-empty)
         '''
@@ -429,28 +461,28 @@ class GalyleoTable:
             range_as_tuple: the tuple representing the range
             new_table_name: name of the new table
             column_types: set of the allowed column types; if empty, any type is permitted
-        
+
         Returns:
             A table with column[column_name] missing and filtered
-        
+
          Throws:
             InvalidDataException if new_table_name is empty, column_name is not a name of an existing column, or the type of column_name isn't in column_types (if column_types is non-empty), if len(range_as_tuple) != 2
         '''
 
         try:
             assert(range_as_tuple and len(range_as_tuple) == 2)
-        except Exception:
-            raise InvalidDataException(f'{range_as_tuple} should be a tuple of length 2')
-        
+        except Exception as original_error:
+            raise InvalidDataException(f'{range_as_tuple} should be a tuple of length 2') from original_error
+
         return self.filter_by_function(column_name, lambda x: x <= range_as_tuple[1] and x >= range_as_tuple[0], new_table_name, column_types)
 
-    # 
+    #
     # A utility to get the index of a column, given a name.  Raises an InvalidDataException
     # is no such column in the schema
     #
-    #   Args: 
+    #   Args:
     #     column_name: name of the column
-    #   
+    #
     #   Returns:
     #     index of the column
     #
@@ -460,14 +492,18 @@ class GalyleoTable:
 
     def _get_column_index(self, column_name):
         indices = [i for i in range(len(self.schema)) if self.schema[i]["name"] == column_name]
-        if (len(indices) == 0):
+        if len(indices) == 0:
             raise InvalidDataException(f'Column {column_name} is not in the schema')
         return indices[0]
-        
-    def pivot_on_column(self, pivot_column_name, value_column_name, new_table_name, pivot_column_values = {}, other_column = False):
+
+    def pivot_on_column(self, pivot_column_name, value_column_name, new_table_name, pivot_column_values = None, other_column = False):
         '''
         The pivot_on_column method breaks out value_column into n separate columns, one for each
-        member of pivot_column_values plus (if other_column = True), an "Other" column.  This is easiest to see with an example.  Consider a table with columns (Year, State, Party, Percentage).  pivot_on_column('Party', {'Republican', 'Democratic'}, 'Percentage', 'pivot_table', False) would create a new table with columns Year, State, Republican, Democratic, where the values in the Republican and Democratic columns are the  values in the Percentage column where the Party column value was Republican or Democratic, respectively.  If Other = True, an additional column, Other, is found where the value is (generally) the sum of values where Party not equal Republican or Democratic
+        member of pivot_column_values plus (if other_column = True), an "Other" column.  This is easiest to see with an example.
+        Consider a table with columns (Year, State, Party, Percentage).  pivot_on_column('Party', {'Republican', 'Democratic'}, 'Percentage', 'pivot_table', False)
+        would create a new table with columns Year, State, Republican, Democratic, where the values in the Republican and Democratic columns are the  values in the
+        Percentage column where the Party column value was Republican or Democratic, respectively.  If Other = True, an additional column, Other, is
+        found where the value is (generally) the sum of values where Party not equal Republican or Democratic
 
         Args:
             pivot_column_name: the column holding the keys to pivot on
@@ -475,43 +511,50 @@ class GalyleoTable:
             new_table_name: name of the new table
             pivot_column_values: the values to pivot on.  If empty, all values used
             other_column: if True, aggregate other values into a column
-        
+
         Returns:
             A table as described in the comments above
-        
+
          Throws:
             InvalidDataException if new_table_name is empty, pivot_column_name is not a name of an existing column, or value_column_name is not the name of an existing column
         '''
-        names = [(new_table_name, 'new_table_name'), (pivot_column_name, 'pivot_column_name'), (value_column_name, 'value_column_name')]
+        if pivot_column_values is None:
+            pivot_column_values = set()
+        names = [
+            (new_table_name, 'new_table_name'),
+            (pivot_column_name, 'pivot_column_name'),
+            (value_column_name, 'value_column_name')
+        ]
         for name in names:
-            if (not name[0]):
+            if not name[0]:
                 raise InvalidDataException(f'{name[1]} cannot be empty')
-        if (value_column_name == pivot_column_name):
+        if value_column_name == pivot_column_name:
             raise InvalidDataException(f'Pivot and value columns cannot be identical: both are {value_column_name}')
-       
+
         value_column_index = self._get_column_index(value_column_name)
         pivot_column_index = self._get_column_index(pivot_column_name)
         key_columns = list(set(range(len(self.schema))) - {value_column_index, pivot_column_index})
         key_columns.sort()
 
 
-        # Split each row into a dict: 
+        # Split each row into a dict:
         # key (value of the other columns). Note this is a tuple so it can index a set
         # pivot_value: value of the pivot column
         # value: value of the value column
 
 
-        def make_record(row):
+        def convert_row_to_record(row):
             return {
                 "key": tuple([row[i] for i in key_columns]),
                 "pivot": row[pivot_column_index],
                 "value": row[value_column_index]
             }
-        
-        partition = [make_record(row) for row in self.data]
-            
 
-        
+        partition = [convert_row_to_record(row) for row in self.data]
+
+
+
+
         # get the set of all distinct keys
         keys = set([record["key"] for record in partition])
 
@@ -522,43 +565,46 @@ class GalyleoTable:
         # (a) other_column = True AND
         # (b) pivot_column_values is not empty AND
         # (c) there are columns in pivot_value_set - pivot_column_values
-        other_columns = pivot_value_set - pivot_column_values if pivot_column_values else {}
+        other_columns = pivot_value_set - pivot_column_values
         use_other = other_column and other_columns
 
-        if (pivot_column_values):
-            pivot_value_set = pivot_value_set.intersection(pivot_column_values)
-
+        pivot_value_set = pivot_value_set.intersection(pivot_column_values)
 
         value_column_type = self.schema[value_column_index]["type"]
-        
+
         def new_pivot_record():
             initial_value = 0 if value_column_type == GALYLEO_NUMBER else None
             result = {}
-            for name in pivot_value_set: result[name] = initial_value
+            for name in pivot_value_set:
+                result[name] = initial_value
             result["Other"] = initial_value
             return result
 
         # set up the dictionary
         pivot_records = {}
-        for key in keys: pivot_records[key] = new_pivot_record()
+        for key in keys:
+            pivot_records[key] = new_pivot_record()
         for record in partition:
             pivot = record["pivot"]
-            if (pivot in pivot_value_set): pivot_records[key][pivot] = record["value"]
+            key = record["key"]
+            if pivot in pivot_value_set:
+                pivot_records[key][pivot] = record["value"]
             else: pivot_records[key]["Other"] = record["value"] + pivot_records[key]["Other"]
-        
+
         # Now just create and return the new table
         new_schema = [self.schema[i] for i in key_columns]
 
         pivot_schema = [{"name": name, "type": value_column_type} for name in pivot_value_set]
-        
-        if (use_other):
+
+        if use_other:
             pivot_schema.append({"name": "Other", "type": value_column_type})
-        
+
         def make_record(key_value):
             result = list(key_value)
             record = pivot_records[key_value]
             values = [record[pivot] for pivot in pivot_value_set]
-            if (use_other): values.append(record["Other"])
+            if  use_other:
+                values.append(record["Other"])
             return result + values
 
         data = [make_record(key) for key in pivot_records]
@@ -571,11 +617,11 @@ class GalyleoTable:
 
 class RemoteGalyleoTable:
     '''
-    A Remote Galyleo Table: This is instantiated with an URL which tells the 
+    A Remote Galyleo Table: This is instantiated with an URL which tells the
     dashboard where to get the data.  Note that this is much simpler than an explicit
     GalyleoTable, since the data manipulation is all done by the remote server.
     '''
-    def __init__(self, name:str, schema, base_url:str, interval:int = -1, header_variables = []):
+    def __init__(self, name:str, schema, base_url:str, interval:int = -1, header_variables = None):
         '''
         Initialize with the name, the schema (same as for an explicit table, above),
         the base_url, and the header_variables which are used for authemtication
@@ -584,28 +630,30 @@ class RemoteGalyleoTable:
             schema: list of the form {"name", "type"} for each column, same as in the parent
             base_url: the base URL to fetch the data from, a string.  The dashboard will add arguments for the methods
                       The server must implement the Galyleo Data Protocol
-            interval: a positive integer, indicating how often (in seconds) to query the table.  If omitted or <= 0, the table is only queried when 
+            interval: a positive integer, indicating how often (in seconds) to query the table.  If omitted or <= 0, the table is only queried when
                     a refresh is requested through a UI action
             header_variables: a list of strings: header variables which are to be transmitted to the data server for authentication
 
         '''
+        if header_variables is None:
+            header_variables = []
         self.name = name
         self.schema = schema
         self.base_url = base_url
         self.interval = interval
-        self.header_variables = header_variables if header_variables else []
+        self.header_variables = header_variables
         self.data = [] # for compatibility with GalyleoTable -- so that client checks for data will be OK
 
     def as_dictionary(self):
-        """     
+        """
         Return the form of the table as a dictionary.  This is a dictionary
         of the form:
-        {"name": <table_name>,"table": <table_struct>} 
+        {"name": <table_name>,"table": <table_struct>}
         where table_struct is of the form:
         {"columns": [<list of schema records], "base_url": base_url, "header_variables": list of header variables}
 
         A schema record is a record of the form:
-        {"name": < column_name>, "type": <column_type}, where type is one of the 
+        {"name": < column_name>, "type": <column_type}, where type is one of the
         Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
         GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
         in galyleo_constants.
@@ -629,21 +677,15 @@ class RemoteGalyleoTable:
                 "connector": connector
             }
         }
-        
+
     def to_json(self):
-        """     
+        """
         Return the table as a JSON string, suitable for transmitting as a message
         or saving to a file.  This is just a JSON form of the dictionary form of
         the string.  (See as_dictionary)
 
         Returns:
            as_dictionary() as a JSON string
-        
+
         """
         return dumps(self.as_dictionary())
-
-        
-       
-
-
-

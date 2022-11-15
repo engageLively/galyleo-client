@@ -65,7 +65,7 @@ def check_valid_spec(filter_spec):
     fields = {
         'ALL': {'arguments', 'operator'},
         'ANY': {'arguments', 'operator'},
-        'NONE': {'argument', 'operator'},
+        'NONE': {'arguments', 'operator'},
         'IN_LIST': {'column', 'values', 'operator'},
         'IN_RANGE': {'column', 'max_val', 'min_val', 'operator'}
     }
@@ -74,23 +74,19 @@ def check_valid_spec(filter_spec):
     if len(missing_fields) > 0:
         raise InvalidDataException(f'{filter_spec} is missing required fields {missing_fields}')
     # For ALL and ANY, recursively check the arguments list and return
-    if (operator in {'ALL', 'ANY'}):
+    if (operator in {'ALL', 'ANY', 'NONE'}):
         if not isinstance(filter_spec['arguments'], list):
             bad_type = type(filter_spec["arguments"])
             msg = f'The arguments field for {operator} must be a list, not {bad_type}'
-            raise InvalidDataException()
+            raise InvalidDataException(msg)
         for arg in filter_spec['arguments']:
             check_valid_spec(arg)
-        return
-    # For NONE, recursively check the argument field
-    elif operator == 'NONE':
-        check_valid_spec(filter_spec['argument'])
         return
     # if we get here, it's IN_LIST or IN_RANGE.  For both, check that the column is a string
     if (not type(filter_spec['column']) in {str, int}):
         bad_type = type(filter_spec["column"])
         msg = f'The column argument to {operator} must be a string or an int, not {bad_type}'
-        raise InvalidDataException()
+        raise InvalidDataException(msg)
     # For IN_LIST, check that the values argument is a list and each item is a string or number
     if operator == 'IN_LIST':
         values_type = type(filter_spec['values'])
@@ -128,21 +124,19 @@ class Filter:
     '''
     def __init__(self, filter_spec, columns):
         self.operator = filter_spec["operator"]
-        if (self.operator == 'ALL' or self.operator == 'ANY'):
+        if (self.operator == 'ALL' or self.operator == 'ANY' or self.operator == 'NONE'):
             self.arguments = [Filter(argument, columns) for argument in filter_spec["arguments"]]
-        elif self.operator == 'NONE':
-            self.argument = Filter(filter_spec['argument'], columns)
         elif self.operator == 'IN_LIST':
             try:
                 self.column = columns.index(filter_spec["column"])
-            except ValueError:
-                raise InvalidDataException(f'{filter_spec["column"]} is not a valid column')
+            except ValueError as original_error:
+                raise InvalidDataException(f'{filter_spec["column"]} is not a valid column')  from original_error
             self.value_list = filter_spec['values']
         else: # operator is IN_RANGE
             try:
                 self.column = columns.index(filter_spec["column"])
-            except ValueError:
-                raise InvalidDataException(f'{filter_spec["column"]} is not a valid column')
+            except ValueError as original_error:
+                raise InvalidDataException(f'{filter_spec["column"]} is not a valid column') from  original_error
             self.max_val = filter_spec['max_val']
             self.min_val = filter_spec['min_val']
 
@@ -179,7 +173,8 @@ class Filter:
             argument_indices = [argument.filter_index(rows) for argument in self.arguments]
             return reduce(lambda x, y: x | y, argument_indices, set())
         elif self.operator == 'NONE':
-            return set(all_indices) - self.argument.filter_index(rows)
+            argument_indices = [argument.filter_index(rows) for argument in self.arguments]
+            return reduce(lambda x, y: x - y, argument_indices, set(all_indices))
         elif self.operator == 'IN_LIST':
             values = [row[self.column] for row in rows]
             return set([i for i in all_indices if values[i] in self.value_list])
@@ -216,8 +211,17 @@ class GalyleoDataServer:
 
     # This is used to get the names of a column from the schema
 
-    def _column_names(self):
+    def column_names(self):
+        '''
+        Return the names of the columns
+        '''
         return [column["name"] for column in self.schema]
+
+    def column_types(self):
+        '''
+        Return the types of the columns
+        '''
+        return [column["type"] for column in self.schema]
 
     def get_column_type(self, column_name):
         '''
@@ -244,9 +248,9 @@ class GalyleoDataServer:
 
         '''
         try:
-            index = self._column_names().index(column_name)
-        except ValueError:
-            raise InvalidDataException(f'{column_name} is not a column of this table')
+            index = self.column_names().index(column_name)
+        except ValueError as original_error:
+            raise InvalidDataException(f'{column_name} is not a column of this table') from original_error
         rows = self.get_rows()
         result =  list(set([row[index] for row in rows]))
         result.sort()
@@ -272,8 +276,8 @@ class GalyleoDataServer:
             difference = [shift[i] - values[i] for i in range(len(shift))]
             increments = [diff for diff in difference if diff > 0]
             return {"max_val": values[-1], "min_val": values[0], "increment": min(increments)}
-        except ValueError:
-            raise InvalidDataException(f'Bad data in column {column_name}')
+        except ValueError as original_error:
+            raise InvalidDataException(f'Bad data in column {column_name}') from original_error
 
     def get_filtered_rows(self, filter_spec):
         '''
@@ -285,5 +289,5 @@ class GalyleoDataServer:
         Returns:
             The subset of self.get_rows() which pass the filter
         '''
-        made_filter = Filter(filter_spec, self._column_names())
+        made_filter = Filter(filter_spec, self.column_names())
         return made_filter.filter(self.get_rows())

@@ -33,11 +33,11 @@ Test Module for the GalyleoServerFramework
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from urllib import response
+# from urllib import response
 from json import loads, dumps
-import pytest
+# import pytest
 import pandas as pd
-from flask import Flask, jsonify
+from flask import Flask
 from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING
 from galyleo.galyleo_server_framework import  galyleo_server_blueprint, add_table_server
 from galyleo.galyleo_table_server import GalyleoDataServer

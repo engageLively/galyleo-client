@@ -47,14 +47,13 @@ After that, requests for the named table will be served by the created data serv
 
 
 import logging
-
 from json import JSONDecodeError, loads
-from flask import Blueprint, request, abort, jsonify
+
+from flask import Blueprint, abort, jsonify, request
+
+from galyleo.galyleo_constants import GALYLEO_NUMBER
 from galyleo.galyleo_exceptions import InvalidDataException
 from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
-from galyleo.galyleo_constants import GALYLEO_NUMBER
-
-
 
 galyleo_server_blueprint = Blueprint('galyleo_server', __name__)
 
@@ -165,8 +164,8 @@ def _get_table_servers(request_api):
     else:
         tables = _get_all_tables(dashboard_name)
         if len(tables) == 0:
-            message = 'No tables found' if dashboard_name is None else f'No tables found for {dashboard_name}'
-            message = message + f' for request {request_api}'
+            message_tail = f' for {dashboard_name}' if dashboard_name is not None else ''
+            message = 'No tables found' +  message_tail  +  f' for request {request_api}'
             _log_and_abort(message)
         else:
             return tables
