@@ -54,9 +54,7 @@ def test_check_filter():
     with pytest.raises(InvalidDataException, match=f'There is no operator in {no_operator_spec}'):
         check_valid_spec(no_operator_spec)
     no_operator_spec = {'operator': 'bar'}
-    valid_operators =  {'IN_LIST', 'ANY', 'NONE', 'IN_RANGE', 'ALL'}
-    # with pytest.raises(InvalidDataException, match=f'bar is not a valid operator.  Valid operators are {valid_operators}'):
-    with pytest.raises(InvalidDataException, match='bar is not a valid operator..*'): 
+    with pytest.raises(InvalidDataException, match='bar is not a valid operator..*'):
         check_valid_spec(no_operator_spec)
     bad_fields = [
         ({'operator': 'ALL'}, {'arguments'}),

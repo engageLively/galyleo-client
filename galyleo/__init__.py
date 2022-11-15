@@ -29,9 +29,14 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-The Python client for Galyleo Tables and JupyterLab.  This client is used to form Galyleo Tables, the basis of charting and dashboards with the Galyleo environment, and send them through the Jupyter communications channel to the browser to be plotted.  The library consists of several modules:
-1. galyleo_table.  Defines a Galyleo Dashboard Table and associated export and import routines.  Used to create a Galyleo Dashboard Table from any of a number of sources, and then generate an object that is suitable
-for storage (as a JSON file).  A GalyleoTable is very similar to  a Google Visualization data table, and can be
+The Python client for Galyleo Tables and JupyterLab.  This client is used to form
+Galyleo Tables, the basis of charting and dashboards with the Galyleo environment,
+and send them through the Jupyter communications channel to the browser to be
+plotted.  The library consists of several modules:
+1. galyleo_table.  Defines a Galyleo Dashboard Table and associated export and import
+routines.  Used to create a Galyleo Dashboard Table from any of a number of sources,
+and then generate an object that is suitable for storage (as a JSON file).  A
+GalyleoTable is very similar to  a Google Visualization data table, and can be
 converted to a Google Visualization Data Table on either the Python or the JavaScript side.
 Convenience routines provided here to import data from pandas, and json format.
 2. galyleo_constants: Constants that are used, primarily by galyleo_table

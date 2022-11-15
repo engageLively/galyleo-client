@@ -32,28 +32,25 @@
 
 # define Python user-defined exceptions
 class Error(Exception):
-  """Base class for other exceptions."""
-  pass
+    """Base class for other exceptions."""
 
 class DataSizeExceeded(Error):
-  """
-  Raised when the data volume is too large on a single request. The exact limitations are specified in README.md and in galyleo_constants
-
-  """
-  def __str__(self):
-    return "Data Size Exceeded"
+    """
+    Raised when the data volume is too large on a single request. The exact limitations are specified in README.md and in galyleo_constants
+    """
+    def __str__(self):
+        return "Data Size Exceeded"
 
 class DataSizeIsZero(Error):
-  """Raised when the data set is empty."""
+    """Raised when the data set is empty."""
 
-  def __str__(self):
-    return "Data Size Is Zero"
+    def __str__(self):
+        return "Data Size Is Zero"
 
 
 
 class InvalidDataException(Exception):
+    '''
+    An exception thrown when a data table (list of rows) doesn't match an accoompanying schema,
+     or a bad schema is specified, or a table row is the wrong length, or..
   '''
-  An exception thrown when a data table (list of rows) doesn't match an accoompanying schema,
-  or a bad schema is specified, or a table row is the wrong length, or..
-  ''' 
-  pass

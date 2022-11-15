@@ -50,7 +50,7 @@ GALYLEO_TIME_OF_DAY = 'timeofday'
 GALYLEO_SCHEMA_TYPES = ['string', 'number', 'boolean', 'date', 'datetime','timeofday']
 
 """ Maximum size of a table sent to the dashboard.  Exceeding this will throw a DataSizeExceeded exception """
-MAX_DATA_SIZE = 1*2**24  
+MAX_DATA_SIZE = 1*2**24
 
 """Maximum number of rows in a table"""
 MAX_TABLE_ROWS = 1000000  # 1 million rows per table  at most.
