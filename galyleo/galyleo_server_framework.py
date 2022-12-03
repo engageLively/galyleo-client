@@ -348,9 +348,12 @@ def get_table_spec():
         {
             "header_variables": {"required" : <list of names>, "optional": <list of names>},
             "schema": list of {"name": <string>, "type": <one of GALYLEO_TYPEs>}
+            
         }
+
     Arguments:
         None
+
     '''
     servers = _get_table_servers('/get_numeric_spec')
     return jsonify({"header_variables": servers[0].header_variables, "schema": servers[0].schema})

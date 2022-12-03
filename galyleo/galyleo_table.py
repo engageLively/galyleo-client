@@ -123,13 +123,16 @@ class GalyleoTable:
         GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY.  All of these are defined
         in galyleoconstants.  data is a list of lists, where each list is a row of
         the table.  Two conditions:
+
             (1) Each type must be one of types listed above
-            (2) Each list in data must have the same length as the schema, and the type of each
-            element must match the corresponding schema type
+            (2) Each list in data must have the same length as the schema, and the type of each element must match the corresponding schema type
+
         throws an InvalidDataException if either of these are violeated
         parameters:
+
             schema: the schema as a list of pairs
             data: the data as a list of lists
+
         '''
 
         for row in data:

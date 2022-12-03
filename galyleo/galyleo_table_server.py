@@ -32,7 +32,8 @@ the tables automatically using the instantiated GalyleoDataServer.
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from functools import reduce
-from galyleo.galyleo_constants import GALYLEO_NUMBER
+from math import nan
+from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_STRING, GALYLEO_BOOLEAN
 from galyleo.galyleo_exceptions import InvalidDataException
 
 def check_valid_spec(filter_spec):
@@ -161,9 +162,12 @@ class Filter:
         Filter the rows according to the specification given to the constructor.
         Returns the INDICES of the  rows for which the filter returns True.
         Arguments:
-              rows: list of list of values, in the same order as the columns
+
+            rows: list of list of values, in the same order as the columns
+
         Returns:
-               INDICES of the rows which pass the filter, AS A SET
+            INDICES of the rows which pass the filter, AS A SET
+ 
         '''
         all_indices = range(len(rows))
         if self.operator == 'ALL':
@@ -182,6 +186,55 @@ class Filter:
             values = [row[self.column] for row in rows]
             return set([i for i in all_indices if values[i] <= self.max_val and values[i] >= self.min_val])
 
+def _convert_to_type(galyleo_type, value):
+    '''
+    Convert value to galyleo_type, so that comparisons can be done.  Currently only works for string, number, and boolean.
+    We will add date and time later.
+    Returns a default value if value can't be converted
+    Note that it's the responsibility of the object which provides the rows to always provide the correct types,
+    so this really should always just return value
+    Arguments:
+        galyleo_type: type to convert to
+        value: value to be converted
+    Returns:
+        value cast to the correct type
+    '''
+    if galyleo_type == GALYLEO_STRING:
+        if isinstance(value, str):
+            return value
+        try:
+            return str(value)
+        except ValueError:
+            return '' # return a default value
+    if galyleo_type == GALYLEO_NUMBER:
+        if isinstance(value, int) or isinstance(value, float):
+            return value
+        try:
+            return float(value)
+        except ValueError:
+            return nan
+    if galyleo_type == GALYLEO_BOOLEAN:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value == 'True'
+        return False
+    return value
+
+def _convert_list_to_type(galyleo_type, value_list):
+    '''
+    Convert value_list to galyleo_type, so that comparisons can be done.  Currently only works for lists of string, number, and boolean.
+    We will add date and time later.
+    Returns a default value if value can't be converted
+    Note that it's the responsibility of the object which provides the rows to always provide the correct types,
+    so this really should always just return a new copy of value_list
+    Arguments:
+        galyleo_type: type to convert to
+        value_list: list of values to be converted
+    Returns:
+        value_list with each element cast to the correct type
+    '''
+    return [_convert_to_type(galyleo_type, elem) for elem in value_list]
 
 DEFAULT_HEADER_VARIABLES = {"required": [], "optional": []}
 '''
@@ -236,13 +289,15 @@ class GalyleoDataServer:
             return None
         else:
             return matches[0]
+       
 
     def all_values(self, column_name:str):
         '''
         get all the values from column_name
-
         Arguments:
+
             column_name: name of the column to get the values for
+
         Returns:
             List of the values
 
@@ -251,18 +306,22 @@ class GalyleoDataServer:
             index = self.column_names().index(column_name)
         except ValueError as original_error:
             raise InvalidDataException(f'{column_name} is not a column of this table') from original_error
+        galyleo_type = self.schema[index]["type"]
         rows = self.get_rows()
-        result =  list(set([row[index] for row in rows]))
+        result =  _convert_list_to_type(galyleo_type, list(set([row[index] for row in rows])))
         result.sort()
         return result
 
     def numeric_spec(self, column_name:str):
         '''
         get the dictionary {min_val, max_val, increment} for column_name
-       Arguments:
+        Arguments:
+
             column_name: name of the column to get the numeric spec for
+
         Returns:
             the minimum, maximum, and increment of the column
+
         '''
         entry = [column for column in self.schema if column["name"] == column_name]
         if len(entry) == 0:
