@@ -9,7 +9,7 @@ setuptools.setup(
     author="engageLively, inc",
     author_email="rick.mcgeer@engagelively.com",
     description="A client to create and exchange  Galyleo tables and data",
-    long_description="A client to create and exchange  Galyleo tables and data",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/engageLively/galyleo-client",
     packages=['galyleo',],  # This is what you import: from galyleo import galyleo_table
