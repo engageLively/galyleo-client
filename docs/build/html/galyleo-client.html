@@ -99,12 +99,14 @@
 </section>
 <section id="module-galyleo.galyleo_table">
 <span id="galyleo-table"></span><h2>Galyleo Table<a class="headerlink" href="#module-galyleo.galyleo_table" title="Permalink to this headline"></a></h2>
+<p>The GalyleoTable and RemoteGalyleoTable classes</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table.</span></span><span class="sig-name descname"><span class="pre">GalyleoTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable" title="Permalink to this definition"></a></dt>
-<dd><p>A Galyleo Dashboard Table.  Used to create a Galyleo Dashboard Table from any of a number of sources, and then generate an object that is suitable
-for storage (as a JSON file).  A GalyleoTable is very similar to  a Google Visualization data table, and can be
-converted to a Google Visualization Data Table on either the Python or the JavaScript side.
+<dd><p>A Galyleo Dashboard Table.  Used to create a Galyleo Dashboard Table from any of a number of
+sources, and then generate an object that is suitable for storage (as a JSON file).  A
+GalyleoTable is very similar to  a Google Visualization data table , and can be converted
+to a Google Visualization Data Table on either the Python or the JavaScript side.
 Convenience routines provided here to import data from pandas, and json format.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable.aggregate_by">
@@ -132,11 +134,11 @@ new_table_name: name of the new table.  If omitted, defaults to None, in which c
 <span class="sig-name descname"><span class="pre">as_dictionary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.as_dictionary" title="Permalink to this definition"></a></dt>
 <dd><p>Return the form of the table as a dictionary.  This is a dictionary
 of the form:
-{“name”: &lt;table_name&gt;,”table”: &lt;table_struct&gt;} 
+{“name”: &lt;table_name&gt;,”table”: &lt;table_struct&gt;}
 where table_struct is of the form:
 {“columns”: [&lt;list of schema records],”rows”: [&lt;list of rows of the table&gt;]}</p>
 <p>A schema record is a record of the form:
-{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the 
+{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the
 Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
 GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
 in galyleo_constants.</p>
@@ -146,6 +148,30 @@ in galyleo_constants.</p>
 <dt>Returns:</dt><dd><p>{“name”: &lt;table_name&gt;, “table”: {“columns”: &lt;list of schema records], “rows”: [&lt;list of rows of the table&gt;]}}</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable.check_schema_match">
+<span class="sig-name descname"><span class="pre">check_schema_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.check_schema_match" title="Permalink to this definition"></a></dt>
+<dd><p>Check that a schema expressed as a list of tuples (name, type)
+matches a list of rows given as data.
+Schema is a list of pairs [(&lt;column_name&gt;, &lt;column_type&gt;)]
+where column_type is one of GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY.  All of these are defined
+in galyleoconstants.  data is a list of lists, where each list is a row of
+the table.  Two conditions:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Each type must be one of types listed above</p></li>
+<li><p>Each list in data must have the same length as the schema, and the type of each element must match the corresponding schema type</p></li>
+</ol>
+</div></blockquote>
+<p>throws an InvalidDataException if either of these are violeated
+parameters:</p>
+<blockquote>
+<div><p>schema: the schema as a list of pairs
+data: the data as a list of lists</p>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
@@ -167,8 +193,8 @@ names_must_match (bool): (default False) if True, table names must also match</p
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable.filter_by_function">
-<span class="sig-name descname"><span class="pre">filter_by_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.filter_by_function" title="Permalink to this definition"></a></dt>
-<dd><p>Create a new table, with name table_name, with rows such that 
+<span class="sig-name descname"><span class="pre">filter_by_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.filter_by_function" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new table, with name table_name, with rows such that
 function(row[column_name]) == True.  The new table will have
 columns {self.columns} - {column_name}, same types, and same order
 Throws an InvalidDataException if:
@@ -254,7 +280,7 @@ overwrite the table name.</p>
 <span class="sig-name descname"><span class="pre">load_from_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_dataframe" title="Permalink to this definition"></a></dt>
 <dd><p>Load from a Pandas Dataframe.  The schema is given in the optional second parameter,
 as a list of records {“name”: &lt;name&gt;, “type”: &lt;type&gt;}, where type is a Galyleo type. (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
-GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY). 
+GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).
 If the second parameter is not present, the schema is derived from the name and
 column types of the dataframe, and each row of the dataframe becomes a row
 of the table.</p>
@@ -267,18 +293,18 @@ schema (list of dictionaries): if present, the schema in list of dictionary form
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable.load_from_dictionary">
-<span class="sig-name descname"><span class="pre">load_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_dictionary" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">load_from_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_as_dictionary</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.load_from_dictionary" title="Permalink to this definition"></a></dt>
 <dd><p>load data from a dictionary of the form: {“columns”: [&lt;list of schema records], “rows”: [&lt;list of rows of the table&gt;]}</p>
 <p>A schema record is a record of the form:
-{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the 
+{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the
 Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
 GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).</p>
 <p>Throws InvalidDataException if the dictionary is of the wrong format
 or the rows don’t match the columns.</p>
 <dl class="simple">
-<dt>Args:</dt><dd><p>dict: the table as a dictionary (a value returned by as_dictionary)</p>
+<dt>Args:</dt><dd><p>table_as_dictionary: the table as a dictionary (a value returned by as_dictionary)</p>
 </dd>
-<dt>Throws:</dt><dd><p>InvalidDataException if dict is malformed</p>
+<dt>Throws:</dt><dd><p>InvalidDataException if table_as_dictionary is malformed</p>
 </dd>
 </dl>
 </dd></dl>
@@ -290,7 +316,7 @@ or the rows don’t match the columns.</p>
 Schema is a list of pairs [(&lt;column_name&gt;, &lt;column_type&gt;)]
 where column_type is one of the Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
 GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
-in galyleo_constants.  data is a list of lists, where each list is a row of 
+in galyleo_constants.  data is a list of lists, where each list is a row of
 the table.  Two conditions:</p>
 <ol class="arabic simple">
 <li><p>Each type must be one of types listed above</p></li>
@@ -307,9 +333,13 @@ data (list of lists): the data as a list of lists</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.GalyleoTable.pivot_on_column">
-<span class="sig-name descname"><span class="pre">pivot_on_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pivot_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pivot_column_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.pivot_on_column" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pivot_on_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pivot_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pivot_column_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.GalyleoTable.pivot_on_column" title="Permalink to this definition"></a></dt>
 <dd><p>The pivot_on_column method breaks out value_column into n separate columns, one for each
-member of pivot_column_values plus (if other_column = True), an “Other” column.  This is easiest to see with an example.  Consider a table with columns (Year, State, Party, Percentage).  pivot_on_column(‘Party’, {‘Republican’, ‘Democratic’}, ‘Percentage’, ‘pivot_table’, False) would create a new table with columns Year, State, Republican, Democratic, where the values in the Republican and Democratic columns are the  values in the Percentage column where the Party column value was Republican or Democratic, respectively.  If Other = True, an additional column, Other, is found where the value is (generally) the sum of values where Party not equal Republican or Democratic</p>
+member of pivot_column_values plus (if other_column = True), an “Other” column.  This is easiest to see with an example.
+Consider a table with columns (Year, State, Party, Percentage).  pivot_on_column(‘Party’, {‘Republican’, ‘Democratic’}, ‘Percentage’, ‘pivot_table’, False)
+would create a new table with columns Year, State, Republican, Democratic, where the values in the Republican and Democratic columns are the  values in the
+Percentage column where the Party column value was Republican or Democratic, respectively.  If Other = True, an additional column, Other, is
+found where the value is (generally) the sum of values where Party not equal Republican or Democratic</p>
 <dl>
 <dt>Args:</dt><dd><p>pivot_column_name: the column holding the keys to pivot on
 value_column_name: the column holding the values to spread out over the pivots
@@ -344,8 +374,8 @@ the string.  (See as_dictionary)</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table.RemoteGalyleoTable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table.</span></span><span class="sig-name descname"><span class="pre">RemoteGalyleoTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.RemoteGalyleoTable" title="Permalink to this definition"></a></dt>
-<dd><p>A Remote Galyleo Table: This is instantiated with an URL which tells the 
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table.</span></span><span class="sig-name descname"><span class="pre">RemoteGalyleoTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.RemoteGalyleoTable" title="Permalink to this definition"></a></dt>
+<dd><p>A Remote Galyleo Table: This is instantiated with an URL which tells the
 dashboard where to get the data.  Note that this is much simpler than an explicit
 GalyleoTable, since the data manipulation is all done by the remote server.</p>
 <dl class="py method">
@@ -353,11 +383,11 @@ GalyleoTable, since the data manipulation is all done by the remote server.</p>
 <span class="sig-name descname"><span class="pre">as_dictionary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table.RemoteGalyleoTable.as_dictionary" title="Permalink to this definition"></a></dt>
 <dd><p>Return the form of the table as a dictionary.  This is a dictionary
 of the form:
-{“name”: &lt;table_name&gt;,”table”: &lt;table_struct&gt;} 
+{“name”: &lt;table_name&gt;,”table”: &lt;table_struct&gt;}
 where table_struct is of the form:
 {“columns”: [&lt;list of schema records], “base_url”: base_url, “header_variables”: list of header variables}</p>
 <p>A schema record is a record of the form:
-{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the 
+{“name”: &lt; column_name&gt;, “type”: &lt;column_type}, where type is one of the
 Galyleo types (GALYLEO_STRING, GALYLEO_NUMBER, GALYLEO_BOOLEAN,
 GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY).  All of these are defined
 in galyleo_constants.</p>
@@ -386,6 +416,7 @@ the string.  (See as_dictionary)</p>
 </section>
 <section id="module-galyleo.galyleo_jupyterlab_client">
 <span id="jupyterlab-client"></span><h2>JupyterLab Client<a class="headerlink" href="#module-galyleo.galyleo_jupyterlab_client" title="Permalink to this headline"></a></h2>
+<p>Define a client – something that sends data to a Galyleo Dashboard</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_jupyterlab_client.GalyleoClient">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_jupyterlab_client.</span></span><span class="sig-name descname"><span class="pre">GalyleoClient</span></span><a class="headerlink" href="#galyleo.galyleo_jupyterlab_client.GalyleoClient" title="Permalink to this definition"></a></dt>
@@ -394,9 +425,9 @@ and handles requests coming from the dashboard for tables.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_jupyterlab_client.GalyleoClient.send_data_to_dashboard">
 <span class="sig-name descname"><span class="pre">send_data_to_dashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">galyleo_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashboard_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#galyleo.galyleo_jupyterlab_client.GalyleoClient.send_data_to_dashboard" title="Permalink to this definition"></a></dt>
-<dd><p>The routine to send a GalyleoTable to the dashboard, optionally specifying a specific 
+<dd><p>The routine to send a GalyleoTable to the dashboard, optionally specifying a specific
 dashboard to send the data to.  If None is specified, sends to all the dashboards.
-The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form) &gt; galyleo_constants.MAX_DATA_SIZE. 
+The table must not have more than galyleo_constants.MAX_NUMBER_ROWS, nor be (in JSON form) &gt; galyleo_constants.MAX_DATA_SIZE.
 If either of these conditions apply, a DataSizeExceeded exception is thrown.
 NOTE: this sends data to one or more open dashboard editors in JupyterLab.  If there are no dashboard editors open, it will have no effect.</p>
 <dl class="simple">
@@ -433,8 +464,10 @@ dashboard_name: name of the dashboard editor to send it to (if None, sent to all
 <dl class="py exception">
 <dt class="sig sig-object py" id="galyleo.galyleo_exceptions.InvalidDataException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidDataException</span></span><a class="headerlink" href="#galyleo.galyleo_exceptions.InvalidDataException" title="Permalink to this definition"></a></dt>
-<dd><p>An exception thrown when a data table (list of rows) doesn’t match an accoompanying schema,
-or a bad schema is specified, or a table row is the wrong length, or..</p>
+<dd><dl class="simple">
+<dt>An exception thrown when a data table (list of rows) doesn’t match an accoompanying schema,</dt><dd><p>or a bad schema is specified, or a table row is the wrong length, or..</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -477,6 +510,12 @@ use a  GalyleoDataServer instance, instantiate it with the schema and a get_rows
 The GalyleoDataServer instance can then be passed to a GalyleoServer with a call to
 galyleo_server_framework.add_table_server, and the server will then be able to serve
 the tables automatically using the instantiated GalyleoDataServer.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.DEFAULT_HEADER_VARIABLES">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_HEADER_VARIABLES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'optional':</span> <span class="pre">[],</span> <span class="pre">'required':</span> <span class="pre">[]}</span></em><a class="headerlink" href="#galyleo.galyleo_table_server.DEFAULT_HEADER_VARIABLES" title="Permalink to this definition"></a></dt>
+<dd><p>The Default for header variables for a table is both required and optional lists are empty.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.Filter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.Filter" title="Permalink to this definition"></a></dt>
@@ -506,11 +545,27 @@ Returns the rows for which the filter returns True.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.Filter.filter_index">
+<span class="sig-name descname"><span class="pre">filter_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rows</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.Filter.filter_index" title="Permalink to this definition"></a></dt>
+<dd><p>Not designed for external call.
+Filter the rows according to the specification given to the constructor.
+Returns the INDICES of the  rows for which the filter returns True.
+Arguments:</p>
+<blockquote>
+<div><p>rows: list of list of values, in the same order as the columns</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>INDICES of the rows which pass the filter, AS A SET</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">GalyleoDataServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_rows</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">GalyleoDataServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_rows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer" title="Permalink to this definition"></a></dt>
 <dd><p>A Galyleo Data Server: This is instantiated with a function get_rows() which  delivers the
 rows, rather than having them explicitly in the Table.  Note that get_rows() <em>must</em> return
 the appropriate number of columns of the appropriate types.</p>
@@ -521,25 +576,44 @@ the appropriate number of columns of the appropriate types.</p>
 <dt>get_rows: a function which returns a list of list of values.  Each component list</dt><dd><p>must have the same length as schema, and the jth element must be of the
 type specified in the jth element of schema</p>
 </dd>
+<dt>header_variables: a dictionary of two fields, required and optional,</dt><dd><p>both of which are lists of strings (variable names).  Either
+or both can be empty.  The variables (and their values) are
+passed with each table request</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.all_values">
 <span class="sig-name descname"><span class="pre">all_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.all_values" title="Permalink to this definition"></a></dt>
-<dd><p>get all the values from column_name</p>
+<dd><p>get all the values from column_name
+Arguments:</p>
+<blockquote>
+<div><p>column_name: name of the column to get the values for</p>
+</div></blockquote>
 <dl class="simple">
-<dt>Arguments:</dt><dd><p>column_name: name of the column to get the values for</p>
-</dd>
 <dt>Returns:</dt><dd><p>List of the values</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.column_names">
+<span class="sig-name descname"><span class="pre">column_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.column_names" title="Permalink to this definition"></a></dt>
+<dd><p>Return the names of the columns</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.column_types">
+<span class="sig-name descname"><span class="pre">column_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.column_types" title="Permalink to this definition"></a></dt>
+<dd><p>Return the types of the columns</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.get_column_type">
 <span class="sig-name descname"><span class="pre">get_column_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.get_column_type" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the type of column column_name, or None if this table doesn’t have a column with that name.</p>
+<dd><p>Returns the type of column column_name, or None if this table doesn’t have a column with
+name  column_name.</p>
 <dl class="simple">
 <dt>Arguments:</dt><dd><p>column_name: name of the column to get the type for</p>
 </dd>
@@ -562,10 +636,12 @@ Returns the rows for which the resulting filter returns True.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.GalyleoDataServer.numeric_spec">
 <span class="sig-name descname"><span class="pre">numeric_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.GalyleoDataServer.numeric_spec" title="Permalink to this definition"></a></dt>
-<dd><p>get the dictionary {min_val, max_val, increment} for column_name</p>
+<dd><p>get the dictionary {min_val, max_val, increment} for column_name
+Arguments:</p>
+<blockquote>
+<div><p>column_name: name of the column to get the numeric spec for</p>
+</div></blockquote>
 <dl class="simple">
-<dt>Arguments:</dt><dd><p>column_name: name of the column to get the numeric spec for</p>
-</dd>
 <dt>Returns:</dt><dd><p>the minimum, maximum, and increment of the column</p>
 </dd>
 </dl>
@@ -576,7 +652,7 @@ Returns the rows for which the resulting filter returns True.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="galyleo.galyleo_table_server.check_valid_spec">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_table_server.</span></span><span class="sig-name descname"><span class="pre">check_valid_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_table_server.check_valid_spec" title="Permalink to this definition"></a></dt>
-<dd><p>Class method which checks to make sure that a filter spec is valid.  
+<dd><p>Class method which checks to make sure that a filter spec is valid.
 Does not return, but throws an InvalidDataException with an error message
 if the filter spec is invalid</p>
 <dl class="simple">
@@ -596,7 +672,11 @@ then calls the method on that server to serve the request.  If no exception is t
 returns a 200 with the result as a JSON structure, and if an exception is thrown, returns
 a 400 with an approrpriate error message.
 All of the methods here except for add_table_server are simply route targets: none are
-designed for calls from any method other than flask</p>
+designed for calls from any method other than flask.
+The way to use this is very simple:
+1. For each Table to be served, create an instance of galyleo_table_server.GalyleoDataServer
+2. Call add_table_server(table_name, data_server, dashboard_name)
+After that, requests for the named table will be served by the created data server.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="galyleo.galyleo_server_framework.add_table_server">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">add_table_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">galyleo_data_server</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dashboard_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.add_table_server" title="Permalink to this definition"></a></dt>
@@ -605,7 +685,7 @@ dashboard_name if it is supplied.   Raises an InvalidDataException if table_name
 None or galyleo_data_server is None or is not an instance of GalyleoDataServer.</p>
 <dl class="simple">
 <dt>Arguments:</dt><dd><p>table_name: name to register the server for
-galyleo_data_server: an instange of GalyleoDataServer which services the requests
+galyleo_data_server: an instance of GalyleoDataServer which services the requests
 dashboard_name: name of the dashboard (optional, None if not supplied)</p>
 </dd>
 </dl>
@@ -666,6 +746,22 @@ for missing arguments, bad table name, or if there is no column_name in the argu
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_table_spec">
+<span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_table_spec</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_table_spec" title="Permalink to this definition"></a></dt>
+<dd><dl>
+<dt>Target for the /get_table_spec route.  Dumps a table_spec, which is a dictionary of the form:</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>“header_variables”: {“required” : &lt;list of names&gt;, “optional”: &lt;list of names&gt;},
+“schema”: list of {“name”: &lt;string&gt;, “type”: &lt;one of GALYLEO_TYPEs&gt;}</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+<dt>Arguments:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="galyleo.galyleo_server_framework.get_tables">
 <span class="sig-prename descclassname"><span class="pre">galyleo.galyleo_server_framework.</span></span><span class="sig-name descname"><span class="pre">get_tables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#galyleo.galyleo_server_framework.get_tables" title="Permalink to this definition"></a></dt>
 <dd><p>Target for the /get_tables route.  Dumps a JSONIfied dictionary of the form:
@@ -707,7 +803,7 @@ Arguments: None</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2021, engageLively.</p>
+    <p>&#169; Copyright 2021-2022, engageLively.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
