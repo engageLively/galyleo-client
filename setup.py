@@ -5,11 +5,11 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="galyleo",  # This is what you pip install it as.
-    version="2022.11.15",
+    version="2022.12.19",
     author="engageLively, inc",
     author_email="rick.mcgeer@engagelively.com",
     description="A client to create and exchange  Galyleo tables and data",
-    long_description=long_description,
+    long_description="A client to create and exchange  Galyleo tables and data",
     long_description_content_type="text/markdown",
     url="https://github.com/engageLively/galyleo-client",
     packages=['galyleo',],  # This is what you import: from galyleo import galyleo_table
