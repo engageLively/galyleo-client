@@ -350,3 +350,23 @@ class GalyleoDataServer:
         '''
         made_filter = Filter(filter_spec, self.column_names())
         return made_filter.filter(self.get_rows())
+
+
+class RowDataServer(GalyleoDataServer):
+    '''
+    A simple utility class to serve data from a static list of rows, which 
+    can be constructed from a CSV file, Excel File, etc.  The idea is to 
+    make it easy for users to create and upload simple datasets to be 
+    served from a general-purpose server.  Note that this will need some
+    authentication.
+    '''
+    def __init__(self, schema, rows):
+        super(schema, self.get_rows)
+        self.rows = rows
+    
+    def get_rows(self):
+        '''
+        Very simple: just return the rows
+        '''
+        return self.rows
+        

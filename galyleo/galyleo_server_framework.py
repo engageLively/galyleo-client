@@ -47,17 +47,71 @@ After that, requests for the named table will be served by the created data serv
 
 
 import logging
+import csv
+import datetime
 from json import JSONDecodeError, loads
 
 from flask import Blueprint, abort, jsonify, request
 
-from galyleo.galyleo_constants import GALYLEO_NUMBER
+from galyleo.galyleo_constants import GALYLEO_NUMBER, GALYLEO_SCHEMA_TYPES, GALYLEO_BOOLEAN, GALYLEO_DATE, GALYLEO_DATETIME, GALYLEO_TIME_OF_DAY
 from galyleo.galyleo_exceptions import InvalidDataException
-from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec
+from galyleo.galyleo_table_server import GalyleoDataServer, check_valid_spec, RowDataServer
+
 
 galyleo_server_blueprint = Blueprint('galyleo_server', __name__)
 
 table_servers = {}
+
+
+def _convert_type(type, value):
+    if type == GALYLEO_NUMBER:
+        return float(value)
+    if type == GALYLEO_DATE:
+        # return a parsed datetime
+        return datetime.datetime.fromisoformat(value)
+    if type == GALYLEO_DATETIME:
+        # return a parsed datetime
+        return datetime.datetime.fromisoformat(value)
+    if type == GALYLEO_TIME_OF_DAY:
+        # return a parsed datetime
+        return datetime.datetime.fromisoformat(value)
+    if type == GALYLEO_BOOLEAN:
+        return True if value else False
+    return value
+
+def _convert_row(types, row):
+    return [_convert_type(types[i], row[i]) for i in range(len(types))]
+    
+
+def create_server_from_csv(table_name, path_to_csv_file):
+    '''
+    Create a server from a CSV file.The file must meet the format for a GalyleoTableServer:
+    1. Each row must contain the same number of columns;
+    2. The first row (row 0) are the names of the columns
+    3. The second row (row 1)  has the types of the columns
+    4. The type of each entry in rows 2-n must match the declared type of the column
+    '''
+    try:
+        with open(path_to_csv_file, 'r') as f:
+            r = csv.reader(f)
+            rows = r.readrows()
+        assert len(rows) > 2
+        num_columns = len(rows[0])
+        for row in rows[1:]: assert len(row) == num_columns
+        for entry in rows[1]: assert entry in GALYLEO_SCHEMA_TYPES
+    except Exception as error:
+        raise InvalidDataException(error)
+    
+    schema = [{"name": rows[0][i], "type": rows[1][i]} for i in range(num_columns)]
+    try:
+        final_rows = [_convert_row(rows[1], row) for row in rows[2:]]
+        server = RowDataServer(schema, final_rows)
+        add_table_server(table_name, server)
+
+    except ValueError as error:
+        raise InvalidDataException(f'{error} raised during type conversion')
+
+
 
 def _get_table_key(table_name, dashboard_name = None):
     '''
